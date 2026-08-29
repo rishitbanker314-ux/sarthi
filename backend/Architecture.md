@@ -57,7 +57,11 @@ Not built yet.
 Not built yet.
 
 ## A8. Auth & security
-Not built yet.
+- **JWKS Key Rotation & DoS Protection:** Cache the JWKS by `kid`. On unknown `kid`, refetch at most ONCE, and globally rate-limit refetches to 1 per 60 seconds to prevent DDoS via fake kids.
+- **Clock Skew:** Strictly allow 60 seconds of clock skew for `exp` and `nbf` claims to handle drifting mobile device clocks.
+- **Mode Confusion Prevention:** Explicitly pin verification algorithms (`ES256` for Supabase, `HS256` for Local) at the call site. Never derive the algorithm from the token header. Reject `HS256` outright when `AUTH_MODE=supabase`.
+- **Concurrency (Lazy Profile Creation):** `GET /me` handles simultaneous requests gracefully (e.g., via `INSERT ... ON CONFLICT DO NOTHING`) to avoid race conditions when lazily creating user rows.
+- **Cross-Tenant Data Leakage:** A central `get_current_user` dependency injects the validated `user_id`. Queries must strictly filter by `user_id == current_user.id` to prevent data leakage between learners.
 
 ## A9. Configuration
 ENV - Environment (development/production)

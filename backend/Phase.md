@@ -12,29 +12,29 @@
 - [x] Frontend confirmed Prism mock works against it
 - [x] Architecture.md, Memory.md, Phase.md created
 
-## Phase 1 — Identity & diagnostic  ⬅ CURRENT
+## Phase 1 — Identity & diagnostic  ✅ COMPLETE (2026-08-29)
 ### Exit criteria
-- [ ] Auth works end-to-end; diagnostic produces a real `LearnerProfile`
+- [x] Auth works end-to-end; diagnostic produces a real `LearnerProfile`
 
 ### Task queue (ordered — take the top unchecked item)
-1. [ ] Pydantic models for LearnerProfile, DiagnosticSession, NextQuestion
-2. [ ] Migration 0002: learner_profiles, diagnostic_sessions
-3. [ ] Diagnostician agent + prompt
-4. [ ] POST /dev/auth/token (HS256 local token generator)
-5. [ ] GET /api/v1/me
-6. [ ] POST /api/v1/diagnostic/sessions
-7. [ ] GET /api/v1/diagnostic/sessions/{id}
-8. [ ] POST /api/v1/diagnostic/sessions/{id}/answer
-9. [ ] POST /api/v1/diagnostic/sessions/{id}/complete
-10. [ ] GET /api/v1/profile/learner
-11. [ ] PATCH /api/v1/profile/learner
-12. [ ] Fixture responses for DEMO_MODE
-13. [ ] Regenerate openapi.yaml, log contract change, notify FE
+1. [x] Pydantic models for LearnerProfile, DiagnosticSession, NextQuestion
+2. [x] Migration 0002: learner_profiles, diagnostic_sessions
+3. [x] Diagnostician agent + prompt
+4. [x] POST /dev/auth/token (HS256 local token generator)
+5. [x] GET /api/v1/me
+6. [x] POST /api/v1/diagnostic/sessions
+7. [x] GET /api/v1/diagnostic/sessions/{id}
+8. [x] POST /api/v1/diagnostic/sessions/{id}/answer
+9. [x] POST /api/v1/diagnostic/sessions/{id}/complete
+10. [x] GET /api/v1/profile/learner
+11. [x] PATCH /api/v1/profile/learner
+12. [x] Fixture responses for DEMO_MODE
+13. [x] Regenerate openapi.yaml, log contract change, notify FE
 
 ### Blocked
 - (nothing)
 
-## Phase 2 — Goal → Plan  ⬜ NOT STARTED
+## Phase 2 — Goal → Plan  ⬅ CURRENT
 ### Exit criteria
 - [ ] A typed goal produces a real plan with a real rationale, live on both apps
 

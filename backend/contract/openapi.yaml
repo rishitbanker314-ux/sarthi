@@ -1,0 +1,533 @@
+openapi: 3.1.0
+info:
+  title: Sarathi API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/me:
+    get:
+      tags:
+      - me
+      summary: Get Me
+      description: 'Get the current learner''s profile.
+
+        Lazily creates a new profile record if this is the learner''s first request.'
+      operationId: get_me_api_v1_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+      security:
+      - HTTPBearer: []
+  /api/v1/diagnostic/sessions:
+    post:
+      tags:
+      - Diagnostic
+      summary: Start Diagnostic Session
+      operationId: start_diagnostic_session_api_v1_diagnostic_sessions_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+      security:
+      - HTTPBearer: []
+  /api/v1/diagnostic/sessions/{session_id}:
+    get:
+      tags:
+      - Diagnostic
+      summary: Resume Diagnostic Session
+      operationId: resume_diagnostic_session_api_v1_diagnostic_sessions__session_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/diagnostic/sessions/{session_id}/answer:
+    post:
+      tags:
+      - Diagnostic
+      summary: Answer Diagnostic Question
+      operationId: answer_diagnostic_question_api_v1_diagnostic_sessions__session_id__answer_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticAnswerRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/diagnostic/sessions/{session_id}/complete:
+    post:
+      tags:
+      - Diagnostic
+      summary: Complete Diagnostic Session
+      operationId: complete_diagnostic_session_api_v1_diagnostic_sessions__session_id__complete_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/profile/learner:
+    get:
+      tags:
+      - Profile
+      summary: Get Profile
+      operationId: get_profile_api_v1_profile_learner_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+      security:
+      - HTTPBearer: []
+    patch:
+      tags:
+      - Profile
+      summary: Patch Profile
+      operationId: patch_profile_api_v1_profile_learner_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LearnerProfilePatchRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /dev/auth/token:
+    post:
+      tags:
+      - dev
+      summary: Generate Dev Token
+      operationId: generate_dev_token_dev_auth_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevAuthRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Accessibility:
+      properties:
+        font_scale:
+          type: number
+          maximum: 2.0
+          minimum: 1.0
+          title: Font Scale
+          default: 1.0
+        reduced_motion:
+          type: boolean
+          title: Reduced Motion
+          default: false
+        screen_reader:
+          type: boolean
+          title: Screen Reader
+          default: false
+        dyslexia_font:
+          type: boolean
+          title: Dyslexia Font
+          default: false
+      type: object
+      title: Accessibility
+    DepthPref:
+      type: string
+      enum:
+      - breadth_survey
+      - depth_mastery
+      title: DepthPref
+    DevAuthRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+      type: object
+      required:
+      - email
+      title: DevAuthRequest
+    DiagnosticActionResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: The session ID
+        status:
+          $ref: '#/components/schemas/DiagnosticStatus'
+          description: The status of the diagnostic session
+        complete:
+          type: boolean
+          title: Complete
+          description: True if the diagnostic is complete and ready to be finalized
+        question:
+          anyOf:
+          - $ref: '#/components/schemas/NextQuestionSchema'
+          - type: 'null'
+          description: The next question to ask the user
+        progress:
+          anyOf:
+          - $ref: '#/components/schemas/DiagnosticProgress'
+          - type: 'null'
+          description: Progress indicator
+      type: object
+      required:
+      - id
+      - status
+      - complete
+      title: DiagnosticActionResponse
+    DiagnosticAnswerRequest:
+      properties:
+        answer:
+          type: string
+          title: Answer
+      type: object
+      required:
+      - answer
+      title: DiagnosticAnswerRequest
+    DiagnosticProgress:
+      properties:
+        answered:
+          type: integer
+          title: Answered
+        estimated_total:
+          type: integer
+          title: Estimated Total
+          default: 10
+      type: object
+      required:
+      - answered
+      title: DiagnosticProgress
+    DiagnosticStatus:
+      type: string
+      enum:
+      - started
+      - completed
+      - abandoned
+      title: DiagnosticStatus
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LearnerProfilePatchRequest:
+      properties:
+        prior_knowledge:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Prior Knowledge
+        pace:
+          anyOf:
+          - $ref: '#/components/schemas/Pace'
+          - type: 'null'
+        representation_pref:
+          anyOf:
+          - $ref: '#/components/schemas/RepresentationPref'
+          - type: 'null'
+        scaffolding_pref:
+          anyOf:
+          - $ref: '#/components/schemas/ScaffoldingPref'
+          - type: 'null'
+        depth_pref:
+          anyOf:
+          - $ref: '#/components/schemas/DepthPref'
+          - type: 'null'
+        motivation:
+          anyOf:
+          - $ref: '#/components/schemas/Motivation'
+          - type: 'null'
+        session_minutes:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Session Minutes
+        language:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Language
+        accessibility:
+          anyOf:
+          - $ref: '#/components/schemas/Accessibility'
+          - type: 'null'
+      type: object
+      title: LearnerProfilePatchRequest
+    LearnerProfileResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        profile_version:
+          type: integer
+          title: Profile Version
+        prior_knowledge:
+          additionalProperties: true
+          type: object
+          title: Prior Knowledge
+        pace:
+          $ref: '#/components/schemas/Pace'
+        representation_pref:
+          $ref: '#/components/schemas/RepresentationPref'
+        scaffolding_pref:
+          $ref: '#/components/schemas/ScaffoldingPref'
+        depth_pref:
+          $ref: '#/components/schemas/DepthPref'
+        motivation:
+          $ref: '#/components/schemas/Motivation'
+        session_minutes:
+          type: integer
+          title: Session Minutes
+        language:
+          type: string
+          title: Language
+        accessibility:
+          $ref: '#/components/schemas/Accessibility'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - user_id
+      - profile_version
+      - prior_knowledge
+      - pace
+      - representation_pref
+      - scaffolding_pref
+      - depth_pref
+      - motivation
+      - session_minutes
+      - language
+      - accessibility
+      - created_at
+      - updated_at
+      title: LearnerProfileResponse
+    MeResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        locale:
+          type: string
+          title: Locale
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        has_learner_profile:
+          type: boolean
+          title: Has Learner Profile
+          default: false
+        profile_version:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Profile Version
+      type: object
+      required:
+      - id
+      - email
+      - display_name
+      - locale
+      - created_at
+      title: MeResponse
+    Motivation:
+      type: string
+      enum:
+      - exam
+      - career
+      - curiosity
+      - project
+      title: Motivation
+    NextQuestionSchema:
+      properties:
+        question_text:
+          type: string
+          title: Question Text
+        question_type:
+          type: string
+          title: Question Type
+        options:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Options
+      type: object
+      required:
+      - question_text
+      - question_type
+      title: NextQuestionSchema
+    Pace:
+      type: string
+      enum:
+      - deliberate
+      - standard
+      - fast
+      title: Pace
+    RepresentationPref:
+      type: string
+      enum:
+      - concrete_first
+      - abstract_first
+      title: RepresentationPref
+    ScaffoldingPref:
+      type: string
+      enum:
+      - worked_examples
+      - guided_discovery
+      title: ScaffoldingPref
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

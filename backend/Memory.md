@@ -8,18 +8,18 @@
 | Method | Path | Status | Tested | Notes |
 |---|---|---|---|---|
 | GET | /health | live | yes | Basic health and db check. DB not mocked but test isolated. |
-| GET | /api/v1/me | mocked | no | contract only |
+| GET | /api/v1/me | live | yes | P1.3 implemented |
 | POST | /diagnostic/sessions | mocked | no | contract only |
 | GET | /diagnostic/sessions/{id} | mocked | no | contract only |
 | POST | /diagnostic/sessions/{id}/answer | mocked | no | contract only |
 | POST | /diagnostic/sessions/{id}/complete | mocked | no | contract only |
 | GET | /profile/learner | mocked | no | contract only |
 | PATCH | /profile/learner | mocked | no | contract only |
-| POST | /dev/auth/token | mocked | no | contract only |
+| POST | /dev/auth/token | live | yes | Local dev authentication |
 
 ### Database
-Tables that exist: `users`, `alembic_version`.
-Latest applied migration ID: 0001.
+Tables that exist: `users`, `alembic_version`, `learner_profiles`, `diagnostic_sessions`, `concepts`.
+Latest applied migration ID: cbe458a6eb04.
 
 ### Agents
 | Agent | Status | Prompt file | Schema class | Tested |
@@ -32,10 +32,59 @@ ENV, DEMO_MODE, AUTH_MODE, DATABASE_URL, ALEMBIC_DATABASE_URL, SUPABASE_URL, SUP
 ### Known broken / half-finished
 - None.
 
+### Agents
+| Runtime | live | _test_prompt.md (mocked) | SmokeAnswer | yes |
+| Diagnostician | live | diagnostician.md | DiagnosticResponse | yes |
+
+### Environment variables in use
+ENV, DEMO_MODE, AUTH_MODE, DATABASE_URL, ALEMBIC_DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWKS_URL, GEMINI_API_KEY, DEV_JWT_SECRET, CORS_ORIGINS, RECORD_FIXTURES
+
+### Known broken / half-finished
+- None.
+
 ### Do not touch
 - None.
 
 ## CHANGELOG — append at top, never edit past entries
+
+### [2026-08-29 15:56] feat(api): Learner Profile endpoints (P1.8)
+- Added: `services/api/routers/profile.py`.
+- Added: `services/api/services/profile.py` for DB logic.
+- Updated: `GET /api/v1/me` now correctly flags `has_learner_profile` by checking for rows in `learner_profiles`.
+- Tested: `tests/test_profile.py` validates GET/PATCH and checks that PATCH correctly bumps the `profile_version`.
+
+### [2026-08-29 15:45] feat(api): Diagnostic session endpoints (P1.7)
+- Added: `services/api/routers/diagnostic.py`.
+- Added: Database logic for creating sessions, recording answers, and finalizing profiles.
+- Tested: `tests/test_diagnostic.py` verifies the full lifecycle from session creation to completion.
+- Contract: Endpoints return `DiagnosticSession` and `DiagnosticResponse` objects as defined in P1.6.
+
+### [2026-08-29 15:39] feat(agents): The Diagnostician Agent (P1.6)
+- Added: `services/agents/diagnostician.py`, `services/agents/prompts/diagnostician.md`.
+- Added: `DiagnosticResponse`, `NextQuestion`, `ProfileDraft`, and `AccessibilityOptions` schemas in `schemas.py`.
+- Added: `fixtures/demo/diagnostician_default.json` for deterministic offline testing and fallback execution.
+- Tested: `tests/test_diagnostician.py` correctly covers the adaptive question logic divergence and tests the offline fallback rule-set behavior (providing 8 distinct questions followed by a drafted ProfileDraft).
+- Contract: The prompt has strict anti-VARK instructions and guarantees that at least 3 questions in the diagnostic sequence are measurable micro-problems.
+- Next: P1.7 - Diagnostic endpoints.
+
+### [2026-08-29 15:33] feat(agents): The agent runtime (P1.5)
+- Added: `services/agents/__init__.py`, `services/agents/schemas.py`, `services/agents/usage.py`, `services/agents/client.py`, `services/agents/base.py`, `services/agents/prompts/.gitkeep`.
+- Added: `fixtures/demo/_smoke_default.json` for `DEMO_MODE=true` testing.
+- Added: `tests/test_agent_base.py`.
+- Changed: Implemented a robust agent execution pipeline (`base.run`) featuring timeout handling (20s flash, 110s pro), simple `{{key}}` string replacement templating, usage statistics tracking, exact 1-retry on validation failure, and a safe fallback factory.
+- Changed: Built `client.py` capable of seamlessly routing to `fixtures/demo` when `DEMO_MODE=true` using a deterministic MD5 hash of inputs.
+- Contract: Agents run through `base.run()`, schemas live in `schemas.py`.
+- Tested: Mocked Gemini SDK responses and simulated validation failures for retries and fallbacks. Verified `DEMO_MODE=true` loads without network requests.
+- Broken/left undone: None.
+- Next: Phase 1 Task 6 (Generating the diagnostic session via prompt).
+
+### [2026-08-29 15:19] feat(api): GET /me and lazy profile creation
+- Added: `services/api/models/user.py` missing from P0.4 and generated Alembic migration `0002_add_users_table`.
+- Added: `MeResponse` schema, `get_or_create_user` logic with `ON CONFLICT DO NOTHING`, and `GET /api/v1/me` route.
+- Contract: Re-generated OpenAPI schema. Updated `contract/status.md`.
+- Tested: Verified DB insertion, idempotency, and 401 unauth scenarios.
+- Broken/left undone: `has_learner_profile` hardcoded to `False` as required (Phase 1 Task 4 will wire this).
+- Next: P1.4 - Learner Profile schema.
 
 ### [2026-08-29 14:06] chore(ai): pin down Gemini SDK and Models
 - Added: `services/agents/models.py` with validated model constants (`gemini-3.1-pro-preview`, `gemini-3.7-flash`, `gemini-3.1-flash-lite`).

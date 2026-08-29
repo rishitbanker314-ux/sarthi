@@ -5,14 +5,12 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from services.api.routers import health, dev_auth, me, diagnostic, profile
+from services.api.routers import health
 from services.api.errors import AppError
-from services.api.config import get_settings
 
 logger = structlog.get_logger()
 
 app = FastAPI(title="Sarathi API", version="0.1.0")
-settings = get_settings()
 
 @app.middleware("http")
 async def global_middleware(request: Request, call_next):
@@ -81,8 +79,3 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 app.include_router(health.router)
-app.include_router(me.router, prefix="/api/v1")
-app.include_router(diagnostic.router)
-app.include_router(profile.router)
-if settings.env != "production":
-    app.include_router(dev_auth.router)

@@ -1,0 +1,45 @@
+import asyncio
+from typing import Dict, Any
+
+class UsageStats:
+    def __init__(self):
+        self._stats: Dict[str, Dict[str, Any]] = {}
+        self._lock = asyncio.Lock()
+
+    async def record(
+        self,
+        agent_name: str,
+        input_tokens: int,
+        output_tokens: int,
+        latency_ms: int,
+        retried: bool,
+        fell_back: bool
+    ):
+        async with self._lock:
+            if agent_name not in self._stats:
+                self._stats[agent_name] = {
+                    "calls": 0,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "latency_ms": 0,
+                    "retries": 0,
+                    "fallbacks": 0,
+                }
+            
+            s = self._stats[agent_name]
+            s["calls"] += 1
+            s["input_tokens"] += input_tokens
+            s["output_tokens"] += output_tokens
+            s["latency_ms"] += latency_ms
+            if retried:
+                s["retries"] += 1
+            if fell_back:
+                s["fallbacks"] += 1
+
+    async def get_all(self) -> Dict[str, Dict[str, Any]]:
+        async with self._lock:
+            # Return a copy to avoid mutation during iteration elsewhere
+            return {k: v.copy() for k, v in self._stats.items()}
+
+# Global accumulator
+usage_stats = UsageStats()

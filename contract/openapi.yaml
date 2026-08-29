@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: Sarathi API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/me:
+    get:
+      tags:
+      - me
+      summary: Get Me
+      description: 'Get the current learner''s profile.
+
+        Lazily creates a new profile record if this is the learner''s first request.'
+      operationId: get_me_api_v1_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+      security:
+      - HTTPBearer: []
+  /dev/auth/token:
+    post:
+      tags:
+      - dev
+      summary: Generate Dev Token
+      operationId: generate_dev_token_dev_auth_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevAuthRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    DevAuthRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+      type: object
+      required:
+      - email
+      title: DevAuthRequest
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    MeResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        locale:
+          type: string
+          title: Locale
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        has_learner_profile:
+          type: boolean
+          title: Has Learner Profile
+          default: false
+        profile_version:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Profile Version
+      type: object
+      required:
+      - id
+      - email
+      - display_name
+      - locale
+      - created_at
+      title: MeResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
