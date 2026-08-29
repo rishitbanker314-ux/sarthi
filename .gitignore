@@ -1,5 +1,0 @@
-.env
-.agents/mcp_config.json
-__pycache__/
-.venv/
-.pytest_cache/
