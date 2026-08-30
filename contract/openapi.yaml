@@ -1,0 +1,1985 @@
+openapi: 3.1.0
+info:
+  title: Sarathi API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /health/usage:
+    get:
+      tags:
+      - Health
+      summary: Get Usage
+      operationId: get_usage_health_usage_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+  /api/v1/lessons/{lesson_id}/checkpoint:
+    post:
+      tags:
+      - Checkpoints
+      summary: Generate Checkpoint
+      operationId: generate_checkpoint_api_v1_lessons__lesson_id__checkpoint_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: lesson_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Lesson Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/checkpoints/{checkpoint_id}/submit:
+    post:
+      tags:
+      - Checkpoints
+      summary: Submit Checkpoint
+      operationId: submit_checkpoint_api_v1_checkpoints__checkpoint_id__submit_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: checkpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Checkpoint Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckpointSubmitRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckpointAttemptResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}:
+    get:
+      tags:
+      - lessons
+      summary: Get Lesson Metadata
+      description: 17 GET /api/v1/lessons/{id} - metadata only
+      operationId: get_lesson_metadata_api_v1_lessons__id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}/start:
+    post:
+      tags:
+      - lessons
+      summary: Start Lesson
+      description: 18 POST /api/v1/lessons/{id}/start - marks in progress, returns
+        thread id
+      operationId: start_lesson_api_v1_lessons__id__start_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}/content:
+    get:
+      tags:
+      - lessons
+      summary: Stream Lesson Content
+      description: 19 GET /api/v1/lessons/{id}/content - SSE stream of ContentBlocks
+      operationId: stream_lesson_content_api_v1_lessons__id__content_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}/reexplain:
+    post:
+      tags:
+      - lessons
+      summary: Reexplain Lesson Block
+      description: 19b POST /api/v1/lessons/{id}/reexplain - SSE stream
+      operationId: reexplain_lesson_block_api_v1_lessons__id__reexplain_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReexplainRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}/complete:
+    post:
+      tags:
+      - lessons
+      summary: Complete Lesson
+      description: 20 POST /api/v1/lessons/{id}/complete
+      operationId: complete_lesson_api_v1_lessons__id__complete_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/lessons/{id}/signals:
+    post:
+      tags:
+      - lessons
+      summary: Create Lesson Signal
+      description: 25 POST /api/v1/lessons/{id}/signals
+      operationId: create_lesson_signal_api_v1_lessons__id__signals_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/tutor/messages:
+    post:
+      tags:
+      - tutor
+      summary: Send Tutor Message
+      description: 21 POST /api/v1/tutor/messages - SSE stream
+      operationId: send_tutor_message_api_v1_tutor_messages_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TutorMessageRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/tutor/threads/{id}:
+    get:
+      tags:
+      - tutor
+      summary: Get Tutor Thread
+      description: 22 GET /api/v1/tutor/threads/{id}
+      operationId: get_tutor_thread_api_v1_tutor_threads__id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/me:
+    get:
+      tags:
+      - me
+      summary: Get Me
+      description: 'Get the current learner''s profile.
+
+        Lazily creates a new profile record if this is the learner''s first request.'
+      operationId: get_me_api_v1_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+      security:
+      - HTTPBearer: []
+  /api/v1/users/me/signals:
+    get:
+      tags:
+      - me
+      summary: Get My Signals
+      description: 26 GET /api/v1/users/me/signals
+      operationId: get_my_signals_api_v1_users_me_signals_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SignalResponse'
+                type: array
+                title: Response Get My Signals Api V1 Users Me Signals Get
+      security:
+      - HTTPBearer: []
+  /api/v1/users/me/progress:
+    get:
+      tags:
+      - me
+      summary: Get My Progress
+      description: 27 GET /api/v1/users/me/progress
+      operationId: get_my_progress_api_v1_users_me_progress_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MasteryStateResponse'
+                type: array
+                title: Response Get My Progress Api V1 Users Me Progress Get
+      security:
+      - HTTPBearer: []
+  /api/v1/diagnostic/sessions:
+    post:
+      tags:
+      - Diagnostic
+      summary: Start Diagnostic Session
+      operationId: start_diagnostic_session_api_v1_diagnostic_sessions_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+      security:
+      - HTTPBearer: []
+  /api/v1/diagnostic/sessions/{session_id}:
+    get:
+      tags:
+      - Diagnostic
+      summary: Resume Diagnostic Session
+      operationId: resume_diagnostic_session_api_v1_diagnostic_sessions__session_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/diagnostic/sessions/{session_id}/answer:
+    post:
+      tags:
+      - Diagnostic
+      summary: Answer Diagnostic Question
+      operationId: answer_diagnostic_question_api_v1_diagnostic_sessions__session_id__answer_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticAnswerRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticActionResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/diagnostic/sessions/{session_id}/complete:
+    post:
+      tags:
+      - Diagnostic
+      summary: Complete Diagnostic Session
+      operationId: complete_diagnostic_session_api_v1_diagnostic_sessions__session_id__complete_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Session Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/profile/learner:
+    get:
+      tags:
+      - Profile
+      summary: Get Profile
+      operationId: get_profile_api_v1_profile_learner_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+      security:
+      - HTTPBearer: []
+    patch:
+      tags:
+      - Profile
+      summary: Patch Profile
+      operationId: patch_profile_api_v1_profile_learner_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LearnerProfilePatchRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearnerProfileResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/goals:
+    post:
+      tags:
+      - Goals
+      summary: Create Goal
+      operationId: create_goal_api_v1_goals_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - Goals
+      summary: List Goals
+      operationId: list_goals_api_v1_goals_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 50
+          title: Size
+      - name: sort_by
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sort By
+      - name: sort_desc
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Sort Desc
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_GoalResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/goals/{goal_id}:
+    patch:
+      tags:
+      - Goals
+      summary: Update Goal
+      operationId: update_goal_api_v1_goals__goal_id__patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: goal_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Goal Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/goals/{goal_id}/plan:
+    post:
+      tags:
+      - Goals
+      summary: Generate Plan Endpoint
+      operationId: generate_plan_endpoint_api_v1_goals__goal_id__plan_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: goal_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Goal Id
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}:
+    get:
+      tags:
+      - Jobs
+      summary: Get Job
+      operationId: get_job_api_v1_jobs__job_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/plans/{plan_id}:
+    get:
+      tags:
+      - Plans
+      summary: Get Plan
+      operationId: get_plan_api_v1_plans__plan_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Plan Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/plans/{plan_id}/replan:
+    post:
+      tags:
+      - Plans
+      summary: Replan
+      operationId: replan_api_v1_plans__plan_id__replan_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Plan Id
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Replan Api V1 Plans  Plan Id  Replan Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/adaptations:
+    get:
+      tags:
+      - adaptation
+      summary: Get Adaptations
+      operationId: get_adaptations_api_v1_adaptations_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 10
+          title: Limit
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+          title: Offset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptationListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/adaptations/{id}/respond:
+    post:
+      tags:
+      - adaptation
+      summary: Respond Adaptation
+      operationId: respond_adaptation_api_v1_adaptations__id__respond_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdaptationRespondRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Respond Adaptation Api V1 Adaptations  Id  Respond
+                  Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /dev/auth/token:
+    post:
+      tags:
+      - dev
+      summary: Generate Dev Token
+      operationId: generate_dev_token_dev_auth_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevAuthRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    Accessibility:
+      properties:
+        font_scale:
+          type: number
+          maximum: 2.0
+          minimum: 1.0
+          title: Font Scale
+          default: 1.0
+        reduced_motion:
+          type: boolean
+          title: Reduced Motion
+          default: false
+        screen_reader:
+          type: boolean
+          title: Screen Reader
+          default: false
+        dyslexia_font:
+          type: boolean
+          title: Dyslexia Font
+          default: false
+      type: object
+      title: Accessibility
+    AdaptationAction:
+      type: string
+      enum:
+      - insert_prerequisite
+      - slow_pace
+      - reexplain_concept
+      - compress_forward
+      - reorder
+      - extend_timeline
+      - no_op
+      title: AdaptationAction
+    AdaptationEventResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        plan_id:
+          type: string
+          format: uuid
+          title: Plan Id
+        trigger:
+          $ref: '#/components/schemas/AdaptationTrigger'
+        action:
+          $ref: '#/components/schemas/AdaptationAction'
+        reason:
+          type: string
+          title: Reason
+        timeline_impact:
+          type: string
+          title: Timeline Impact
+        before:
+          additionalProperties: true
+          type: object
+          title: Before
+        after:
+          additionalProperties: true
+          type: object
+          title: After
+        accepted:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Accepted
+      type: object
+      required:
+      - id
+      - created_at
+      - plan_id
+      - trigger
+      - action
+      - reason
+      - timeline_impact
+      - before
+      - after
+      - accepted
+      title: AdaptationEventResponse
+    AdaptationListResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AdaptationEventResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+      type: object
+      required:
+      - items
+      - total
+      title: AdaptationListResponse
+    AdaptationRespondRequest:
+      properties:
+        accepted:
+          type: boolean
+          title: Accepted
+      type: object
+      required:
+      - accepted
+      title: AdaptationRespondRequest
+    AdaptationTrigger:
+      type: string
+      enum:
+      - struggling
+      - stuck
+      - racing
+      - stalled
+      - decaying
+      title: AdaptationTrigger
+    CheckpointAttemptResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        score:
+          type: number
+          title: Score
+        mastery_deltas:
+          items:
+            $ref: '#/components/schemas/MasteryDelta'
+          type: array
+          title: Mastery Deltas
+        feedback:
+          items:
+            $ref: '#/components/schemas/ItemFeedback'
+          type: array
+          title: Feedback
+        submitted_at:
+          type: string
+          format: date-time
+          title: Submitted At
+      type: object
+      required:
+      - id
+      - score
+      - mastery_deltas
+      - feedback
+      - submitted_at
+      title: CheckpointAttemptResponse
+    CheckpointItem:
+      properties:
+        id:
+          type: string
+          title: Id
+        type:
+          type: string
+          title: Type
+        question:
+          type: string
+          title: Question
+        options:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Options
+        concept_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Concept Ids
+      type: object
+      required:
+      - id
+      - type
+      - question
+      - concept_ids
+      title: CheckpointItem
+    CheckpointResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        lesson_id:
+          type: string
+          format: uuid
+          title: Lesson Id
+        items:
+          items:
+            $ref: '#/components/schemas/CheckpointItem'
+          type: array
+          title: Items
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - lesson_id
+      - items
+      - created_at
+      title: CheckpointResponse
+    CheckpointSubmitRequest:
+      properties:
+        responses:
+          additionalProperties: true
+          type: object
+          title: Responses
+      type: object
+      required:
+      - responses
+      title: CheckpointSubmitRequest
+    DepthPref:
+      type: string
+      enum:
+      - breadth_survey
+      - depth_mastery
+      title: DepthPref
+    DevAuthRequest:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+      type: object
+      required:
+      - email
+      title: DevAuthRequest
+    DiagnosticActionResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+          description: The session ID
+        status:
+          $ref: '#/components/schemas/DiagnosticStatus'
+          description: The status of the diagnostic session
+        complete:
+          type: boolean
+          title: Complete
+          description: True if the diagnostic is complete and ready to be finalized
+        question:
+          anyOf:
+          - $ref: '#/components/schemas/NextQuestionSchema'
+          - type: 'null'
+          description: The next question to ask the user
+        progress:
+          anyOf:
+          - $ref: '#/components/schemas/DiagnosticProgress'
+          - type: 'null'
+          description: Progress indicator
+      type: object
+      required:
+      - id
+      - status
+      - complete
+      title: DiagnosticActionResponse
+    DiagnosticAnswerRequest:
+      properties:
+        answer:
+          type: string
+          title: Answer
+      type: object
+      required:
+      - answer
+      title: DiagnosticAnswerRequest
+    DiagnosticProgress:
+      properties:
+        answered:
+          type: integer
+          title: Answered
+        estimated_total:
+          type: integer
+          title: Estimated Total
+          default: 10
+      type: object
+      required:
+      - answered
+      title: DiagnosticProgress
+    DiagnosticStatus:
+      type: string
+      enum:
+      - started
+      - completed
+      - abandoned
+      title: DiagnosticStatus
+    GoalCreate:
+      properties:
+        raw_input:
+          type: string
+          minLength: 10
+          title: Raw Input
+          description: The raw natural language input describing the goal.
+      type: object
+      required:
+      - raw_input
+      title: GoalCreate
+    GoalResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        raw_input:
+          type: string
+          title: Raw Input
+        normalized_topic:
+          type: string
+          title: Normalized Topic
+        target_level:
+          type: string
+          title: Target Level
+        deadline:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Deadline
+        motivation_hint:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Motivation Hint
+        is_educational:
+          type: boolean
+          title: Is Educational
+        clarification_needed:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Clarification Needed
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - user_id
+      - raw_input
+      - normalized_topic
+      - target_level
+      - deadline
+      - motivation_hint
+      - is_educational
+      - clarification_needed
+      - status
+      - created_at
+      - updated_at
+      title: GoalResponse
+    GoalUpdate:
+      properties:
+        normalized_topic:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Normalized Topic
+          description: Corrected topic.
+        target_level:
+          anyOf:
+          - type: string
+            enum:
+            - beginner
+            - intermediate
+            - advanced
+          - type: 'null'
+          title: Target Level
+          description: Corrected target level.
+        deadline:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Deadline
+          description: Corrected deadline.
+      type: object
+      title: GoalUpdate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ItemFeedback:
+      properties:
+        item_id:
+          type: string
+          title: Item Id
+        correct:
+          type: boolean
+          title: Correct
+        explanation:
+          type: string
+          title: Explanation
+      type: object
+      required:
+      - item_id
+      - correct
+      - explanation
+      title: ItemFeedback
+    JobError:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+        retryable:
+          type: boolean
+          title: Retryable
+        details:
+          additionalProperties: true
+          type: object
+          title: Details
+      type: object
+      required:
+      - code
+      - message
+      - retryable
+      title: JobError
+    JobKind:
+      type: string
+      enum:
+      - plan_generation
+      - replan
+      title: JobKind
+    JobResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        kind:
+          $ref: '#/components/schemas/JobKind'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        progress:
+          type: integer
+          title: Progress
+        progress_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Progress Message
+        result:
+          anyOf:
+          - $ref: '#/components/schemas/PlanGenerationResult'
+          - $ref: '#/components/schemas/ReplanResult'
+          - type: 'null'
+          title: Result
+        error:
+          anyOf:
+          - $ref: '#/components/schemas/JobError'
+          - type: 'null'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - user_id
+      - kind
+      - status
+      - progress
+      - created_at
+      - updated_at
+      title: JobResponse
+    JobStatus:
+      type: string
+      enum:
+      - queued
+      - running
+      - succeeded
+      - failed
+      title: JobStatus
+    LearnerProfilePatchRequest:
+      properties:
+        prior_knowledge:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Prior Knowledge
+        pace:
+          anyOf:
+          - $ref: '#/components/schemas/Pace'
+          - type: 'null'
+        representation_pref:
+          anyOf:
+          - $ref: '#/components/schemas/RepresentationPref'
+          - type: 'null'
+        scaffolding_pref:
+          anyOf:
+          - $ref: '#/components/schemas/ScaffoldingPref'
+          - type: 'null'
+        depth_pref:
+          anyOf:
+          - $ref: '#/components/schemas/DepthPref'
+          - type: 'null'
+        motivation:
+          anyOf:
+          - $ref: '#/components/schemas/Motivation'
+          - type: 'null'
+        session_minutes:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Session Minutes
+        language:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Language
+        accessibility:
+          anyOf:
+          - $ref: '#/components/schemas/Accessibility'
+          - type: 'null'
+      type: object
+      title: LearnerProfilePatchRequest
+    LearnerProfileResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        profile_version:
+          type: integer
+          title: Profile Version
+        prior_knowledge:
+          additionalProperties: true
+          type: object
+          title: Prior Knowledge
+        pace:
+          $ref: '#/components/schemas/Pace'
+        representation_pref:
+          $ref: '#/components/schemas/RepresentationPref'
+        scaffolding_pref:
+          $ref: '#/components/schemas/ScaffoldingPref'
+        depth_pref:
+          $ref: '#/components/schemas/DepthPref'
+        motivation:
+          $ref: '#/components/schemas/Motivation'
+        session_minutes:
+          type: integer
+          title: Session Minutes
+        language:
+          type: string
+          title: Language
+        accessibility:
+          $ref: '#/components/schemas/Accessibility'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - user_id
+      - profile_version
+      - prior_knowledge
+      - pace
+      - representation_pref
+      - scaffolding_pref
+      - depth_pref
+      - motivation
+      - session_minutes
+      - language
+      - accessibility
+      - created_at
+      - updated_at
+      title: LearnerProfileResponse
+    LessonResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        module_id:
+          type: string
+          format: uuid
+          title: Module Id
+        order_index:
+          type: integer
+          title: Order Index
+        title:
+          type: string
+          title: Title
+        objective:
+          type: string
+          title: Objective
+        concept_ids:
+          items:
+            type: string
+            format: uuid
+          type: array
+          title: Concept Ids
+        est_minutes:
+          type: integer
+          title: Est Minutes
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - module_id
+      - order_index
+      - title
+      - objective
+      - concept_ids
+      - est_minutes
+      - status
+      - created_at
+      title: LessonResponse
+    MasteryDelta:
+      properties:
+        concept_id:
+          type: string
+          format: uuid
+          title: Concept Id
+        delta:
+          type: number
+          title: Delta
+      type: object
+      required:
+      - concept_id
+      - delta
+      title: MasteryDelta
+    MasteryStateResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        concept_id:
+          type: string
+          format: uuid
+          title: Concept Id
+        score:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Score
+        confidence:
+          type: string
+          pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+          title: Confidence
+        attempts:
+          type: integer
+          title: Attempts
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        last_seen_at:
+          type: string
+          format: date-time
+          title: Last Seen At
+      type: object
+      required:
+      - id
+      - user_id
+      - concept_id
+      - score
+      - confidence
+      - attempts
+      - created_at
+      - last_seen_at
+      title: MasteryStateResponse
+    MeResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        email:
+          type: string
+          title: Email
+        display_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Display Name
+        locale:
+          type: string
+          title: Locale
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        has_learner_profile:
+          type: boolean
+          title: Has Learner Profile
+          default: false
+        profile_version:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Profile Version
+      type: object
+      required:
+      - id
+      - email
+      - display_name
+      - locale
+      - created_at
+      title: MeResponse
+    ModuleResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        plan_id:
+          type: string
+          format: uuid
+          title: Plan Id
+        order_index:
+          type: integer
+          title: Order Index
+        title:
+          type: string
+          title: Title
+        objective:
+          type: string
+          title: Objective
+        rationale:
+          type: string
+          title: Rationale
+        est_minutes:
+          type: integer
+          title: Est Minutes
+        status:
+          type: string
+          title: Status
+        lessons:
+          items:
+            $ref: '#/components/schemas/LessonResponse'
+          type: array
+          title: Lessons
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - plan_id
+      - order_index
+      - title
+      - objective
+      - rationale
+      - est_minutes
+      - status
+      - lessons
+      - created_at
+      title: ModuleResponse
+    Motivation:
+      type: string
+      enum:
+      - exam
+      - career
+      - curiosity
+      - project
+      title: Motivation
+    NextQuestionSchema:
+      properties:
+        question_text:
+          type: string
+          title: Question Text
+        question_type:
+          type: string
+          title: Question Type
+        options:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Options
+      type: object
+      required:
+      - question_text
+      - question_type
+      title: NextQuestionSchema
+    Pace:
+      type: string
+      enum:
+      - deliberate
+      - standard
+      - fast
+      title: Pace
+    PaginatedResponse_GoalResponse_:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/GoalResponse'
+          type: array
+          title: Data
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        size:
+          type: integer
+          title: Size
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - data
+      - total
+      - page
+      - size
+      - has_more
+      title: PaginatedResponse[GoalResponse]
+    PlanGenerationResult:
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+          title: Plan Id
+      type: object
+      required:
+      - plan_id
+      title: PlanGenerationResult
+    PlanResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        goal_id:
+          type: string
+          format: uuid
+          title: Goal Id
+        version:
+          type: integer
+          title: Version
+        title:
+          type: string
+          title: Title
+        rationale:
+          type: string
+          title: Rationale
+        profile_version:
+          type: integer
+          title: Profile Version
+        status:
+          type: string
+          title: Status
+        modules:
+          items:
+            $ref: '#/components/schemas/ModuleResponse'
+          type: array
+          title: Modules
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - goal_id
+      - version
+      - title
+      - rationale
+      - profile_version
+      - status
+      - modules
+      - created_at
+      title: PlanResponse
+    ReexplainRequest:
+      properties:
+        block_id:
+          type: string
+          format: uuid
+          title: Block Id
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+      type: object
+      required:
+      - block_id
+      title: ReexplainRequest
+    ReplanResult:
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+          title: Plan Id
+        adaptation_event_id:
+          type: string
+          format: uuid
+          title: Adaptation Event Id
+      type: object
+      required:
+      - plan_id
+      - adaptation_event_id
+      title: ReplanResult
+    RepresentationPref:
+      type: string
+      enum:
+      - concrete_first
+      - abstract_first
+      title: RepresentationPref
+    ScaffoldingPref:
+      type: string
+      enum:
+      - worked_examples
+      - guided_discovery
+      title: ScaffoldingPref
+    SignalCreate:
+      properties:
+        block_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Block Id
+        type:
+          $ref: '#/components/schemas/SignalType'
+        value:
+          additionalProperties: true
+          type: object
+          title: Value
+          default: {}
+      type: object
+      required:
+      - type
+      title: SignalCreate
+    SignalResponse:
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Id
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        lesson_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Lesson Id
+        block_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Block Id
+        type:
+          $ref: '#/components/schemas/SignalType'
+        value:
+          additionalProperties: true
+          type: object
+          title: Value
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - user_id
+      - lesson_id
+      - block_id
+      - type
+      - value
+      - created_at
+      title: SignalResponse
+    SignalType:
+      type: string
+      enum:
+      - checkpoint_score
+      - confusion_flag
+      - time_on_block
+      - hint_requested
+      - retry
+      - inline_check_failed
+      - skip
+      - session_abandon
+      - revisit
+      title: SignalType
+    TutorMessageRequest:
+      properties:
+        lesson_id:
+          type: string
+          format: uuid
+          title: Lesson Id
+        thread_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Thread Id
+        content:
+          type: string
+          title: Content
+        context_block_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Context Block Id
+      type: object
+      required:
+      - lesson_id
+      - content
+      title: TutorMessageRequest
+    UsageResponse:
+      properties:
+        agents:
+          additionalProperties:
+            additionalProperties: true
+            type: object
+          type: object
+          title: Agents
+        total_cost_usd:
+          type: number
+          title: Total Cost Usd
+        total_cost_inr:
+          type: number
+          title: Total Cost Inr
+      type: object
+      required:
+      - agents
+      - total_cost_usd
+      - total_cost_inr
+      title: UsageResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
