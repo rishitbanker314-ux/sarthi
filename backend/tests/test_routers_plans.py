@@ -137,3 +137,43 @@ async def test_plan_already_generating_guard(client: AsyncClient, db_session: As
     assert response.status_code == 409
     data = response.json()
     assert "PLAN_ALREADY_GENERATING" in data["error"]["message"]
+
+@pytest.mark.asyncio
+async def test_replan_flow(client: AsyncClient, db_session: AsyncSession, test_user, goal, profile, token_headers, monkeypatch):
+    # Create initial plan for replanning
+    plan_id = uuid.uuid4()
+    plan = Plan(id=plan_id, goal_id=goal.id, version=1, title="Old Plan", rationale="", profile_version=1, status="draft")
+    db_session.add(plan)
+    await db_session.commit()
+
+    monkeypatch.setattr("services.api.jobs.runner.async_session", DummySessionMaker(db_session))
+    monkeypatch.setattr("services.api.jobs.replan.async_session", DummySessionMaker(db_session))
+    
+    # 1. Trigger Replan
+    response = await client.post(
+        f"/api/v1/plans/{plan_id}/replan",
+        headers=token_headers
+    )
+    assert response.status_code == 202
+    data = response.json()
+    assert "job_id" in data
+    job_id = data["job_id"]
+    
+    # 2. Wait for Job to Complete
+    import asyncio
+    max_retries = 30
+    for _ in range(max_retries):
+        job_resp = await client.get(f"/api/v1/jobs/{job_id}", headers=token_headers)
+        assert job_resp.status_code == 200
+        job_data = job_resp.json()
+        if job_data["status"] == "succeeded":
+            assert "result" in job_data and job_data["result"] is not None, "Job result is missing"
+            assert "plan_id" in job_data["result"], "plan_id missing from job result"
+            assert "adaptation_event_id" in job_data["result"], "adaptation_event_id missing from job result"
+            break
+        elif job_data["status"] == "failed":
+            # If trigger evaluate returns None, it might fast-path to "succeeded" or something. Wait, in replan.py if no trigger it returns early with success.
+            pytest.fail(f"Job failed: {job_data.get('error')}")
+        await asyncio.sleep(0.1)
+    else:
+        pytest.fail("Job did not complete in time")
