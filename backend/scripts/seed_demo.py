@@ -8,92 +8,113 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import AsyncSession
 from services.api.db import async_session
 from services.api.models import User, LearnerProfile, Goal, Plan, Module, Lesson, LessonContent
 from services.api.models.enums import Pace, RepresentationPref, ScaffoldingPref, DepthPref, Motivation
-from sqlalchemy import select
+from sqlalchemy import select, delete
+from services.api.routers.dev_auth import dev_user_id
 
 async def seed_demo_user():
+    email = "demo@sarathi.app"
+    expected_user_id = dev_user_id(email)
+
     async with async_session() as db:
         async with db.begin():
-            
             # Check if demo user already exists
-            result = await db.execute(select(User).where(User.email == "demo@sarathi.app"))
-            demo_user = result.scalar_one_or_none()
+            result = await db.execute(select(User).where(User.email == email))
+            demo_user = result.scalars().first()
             if not demo_user:
-                print("❌ User 'demo@sarathi.app' not found! Please sign up via the frontend first.")
-                return
-                
-            # Check if already seeded
-            profile_result = await db.execute(select(LearnerProfile).where(LearnerProfile.user_id == demo_user.id))
-            if profile_result.scalar_one_or_none():
-                print(f"⚠️ Demo user 'demo@sarathi.app' is already seeded (User ID: {demo_user.id})")
-                return
+                print(f"Creating missing demo user: {email} with ID {expected_user_id}")
+                demo_user = User(id=expected_user_id, email=email)
+                db.add(demo_user)
+                await db.flush()
+            elif demo_user.id != expected_user_id:
+                print(f"⚠️ Warning: Existing demo user has ID {demo_user.id}, but dev_auth expects {expected_user_id}")
+            
+            # Delete old profiles for this user
+            await db.execute(delete(LearnerProfile).where(LearnerProfile.user_id == demo_user.id))
+            
             profile = LearnerProfile(
                 user_id=demo_user.id,
                 profile_version=1,
-                prior_knowledge="Basic programming experience in Python.",
-                pace=Pace.standard,
+                prior_knowledge={},
+                pace=Pace.deliberate,
                 representation_pref=RepresentationPref.concrete_first,
-                scaffolding_pref=ScaffoldingPref.guided_discovery,
+                scaffolding_pref=ScaffoldingPref.worked_examples,
                 depth_pref=DepthPref.depth_mastery,
-                motivation=Motivation.career,
-                session_minutes=30,
-                language="English"
+                motivation=Motivation.exam,
+                session_minutes=25,
+                language="en",
+                accessibility={
+                    "font_scale": 1.0,
+                    "reduced_motion": False,
+                    "screen_reader": False,
+                    "dyslexia_font": False
+                }
             )
             db.add(profile)
+            print("Created LearnerProfile for demo user.")
             
-            # Create Goal
-            goal = Goal(
-                user_id=demo_user.id,
-                raw_input="I want to learn data structures and algorithms to pass technical interviews.",
-                normalized_topic="Data Structures and Algorithms",
-                target_level="Intermediate",
-                deadline=None,
-                status="planned"
-            )
-            db.add(goal)
-            await db.flush()
-            
-            # Create Plan
-            plan = Plan(
-                user_id=demo_user.id,
-                goal_id=goal.id,
-                total_est_minutes=300
-            )
-            db.add(plan)
-            await db.flush()
-            
-            # Create Module
-            module = Module(
-                plan_id=plan.id,
-                title="Introduction to Arrays and Strings",
-                description="Master the fundamentals of array manipulation.",
-                order_index=0
-            )
-            db.add(module)
-            await db.flush()
-            
-            # Create Lesson
-            lesson = Lesson(
-                module_id=module.id,
-                title="Array Reversal Techniques",
-                objective="Learn how to reverse an array in-place.",
-                concept_ids=["array", "in-place", "two-pointers"],
-                est_minutes=20,
-                order_index=0,
-                status="planned"
-            )
-            db.add(lesson)
-            await db.flush()
-            
-            # Cache some Lesson Content
-            lesson_content = LessonContent(
-                lesson_id=lesson.id,
-                profile_version=1,
-                blocks={
-                    "blocks": [
+            # Check if Goal exists to avoid duplicates when running twice
+            goal_result = await db.execute(select(Goal).where(Goal.user_id == demo_user.id))
+            goal = goal_result.scalars().first()
+            if not goal:
+                # Create Goal
+                goal = Goal(
+                    user_id=demo_user.id,
+                    raw_input="I want to learn data structures and algorithms to pass technical interviews.",
+                    normalized_topic="Data Structures and Algorithms",
+                    target_level="Intermediate",
+                    deadline=None,
+                    status="planned"
+                )
+                db.add(goal)
+                await db.flush()
+                
+                # Create Plan
+                plan = Plan(
+                    user_id=demo_user.id,
+                    goal_id=goal.id,
+                    version=1,
+                    title="DSA Mastery",
+                    rationale="To pass technical interviews.",
+                    profile_version=1,
+                    status="draft"
+                )
+                db.add(plan)
+                await db.flush()
+                
+                # Create Module
+                module = Module(
+                    plan_id=plan.id,
+                    title="Introduction to Arrays and Strings",
+                    objective="Master the fundamentals of array manipulation.",
+                    rationale="Arrays and strings are the building blocks of most technical interviews.",
+                    est_minutes=20,
+                    order_index=0,
+                    status="draft"
+                )
+                db.add(module)
+                await db.flush()
+                
+                # Create Lesson
+                lesson = Lesson(
+                    module_id=module.id,
+                    title="Array Reversal Techniques",
+                    objective="Learn how to reverse an array in-place.",
+                    concept_ids=[],
+                    est_minutes=20,
+                    order_index=0,
+                    status="draft"
+                )
+                db.add(lesson)
+                await db.flush()
+                
+                # Cache some Lesson Content
+                lesson_content = LessonContent(
+                    lesson_id=lesson.id,
+                    profile_version=1,
+                    blocks=[
                         {
                             "id": "block-1",
                             "type": "explanation",
@@ -117,11 +138,13 @@ async def seed_demo_user():
                                 "explanation": "We iterate through half of the array, which takes O(n/2) time. This simplifies to O(n)."
                             }
                         }
-                    ]
-                },
-                token_cost=150
-            )
-            db.add(lesson_content)
+                    ],
+                    token_cost=150
+                )
+                db.add(lesson_content)
+                print("Created goal, plan, module, and lesson data.")
+            else:
+                print("Goal already exists, skipping creation of plan data.")
             
             print(f"✅ Demo user 'demo@sarathi.app' seeded successfully. (User ID: {demo_user.id})")
 

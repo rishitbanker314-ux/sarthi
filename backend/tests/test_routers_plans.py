@@ -79,6 +79,9 @@ async def test_plan_generation_flow(client: AsyncClient, db_session: AsyncSessio
         assert job_resp.status_code == 200
         job_data = job_resp.json()
         if job_data["status"] == "succeeded":
+            assert "result" in job_data and job_data["result"] is not None, "Job result is missing"
+            assert "plan_id" in job_data["result"], "plan_id missing from job result"
+            assert job_data["result"]["plan_id"] is not None
             break
         elif job_data["status"] == "failed":
             pytest.fail(f"Job failed: {job_data.get('error')}")

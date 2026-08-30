@@ -101,5 +101,6 @@ def get_plan_generation_worker(goal_id: uuid.UUID, user_id: uuid.UUID) -> Callab
             
             await db.commit()
             await report(100, "Done")
+            return {"plan_id": str(new_plan.id)}
 
     return worker
