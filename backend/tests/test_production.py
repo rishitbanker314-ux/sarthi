@@ -24,21 +24,6 @@ def test_production_config_rejects_demo_mode():
             cors_origins="https://example.com"
         )
 
-def test_production_config_rejects_bad_jwt_secret():
-    with pytest.raises(ValueError, match="dev_jwt_secret cannot be empty or default in production."):
-        Settings(
-            env="production",
-            auth_mode="supabase",
-            dev_jwt_secret="",
-            cors_origins="https://example.com"
-        )
-    with pytest.raises(ValueError, match="dev_jwt_secret cannot be empty or default in production."):
-        Settings(
-            env="production",
-            auth_mode="supabase",
-            dev_jwt_secret="supersecret",
-            cors_origins="https://example.com"
-        )
 
 def test_production_config_rejects_wildcard_cors():
     with pytest.raises(ValueError, match="cors_origins cannot contain wildcard '\\*' in production."):

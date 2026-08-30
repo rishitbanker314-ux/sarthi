@@ -11,9 +11,16 @@ from services.api.errors import AppError
 from services.api.config import get_settings
 from services.api.middleware import RequestLoggingMiddleware, SecurityHeadersMiddleware
 
+from services.api.rate_limiter import limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
 logger = structlog.get_logger()
 
 app = FastAPI(title="Sarathi API", version="0.1.0")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 settings = get_settings()
 
 app.add_middleware(SecurityHeadersMiddleware)
@@ -65,6 +72,21 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
                 "code": "HTTP_ERROR",
                 "message": exc.detail,
                 "retryable": False,
+                "details": {},
+            }
+        },
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("unhandled_exception", error=str(exc))
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An unexpected internal error occurred.",
+                "retryable": True,
                 "details": {},
             }
         },

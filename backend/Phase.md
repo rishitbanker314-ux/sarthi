@@ -58,30 +58,30 @@
 ### Blocked
 - (nothing)
 
-## Phase 3 — Lesson & checkpoint  ⬅ CURRENT
+## Phase 3 — Lesson & checkpoint  ✅ COMPLETE (2026-08-30)
 ### Exit criteria
-- [ ] A lesson is generated, streamed, rendered and assessed; mastery moves
+- [x] A lesson is generated, streamed, rendered and assessed; mastery moves
 
 ### Task queue (ordered)
-1. [ ] Migration 0004: lesson_contents, checkpoints, checkpoint_attempts, mastery_states, tutor_threads, tutor_messages, signals
-2. [ ] SSE infrastructure (`sse-streaming` skill)
-3. [ ] Tutor agent and prompt (`new-agent` skill)
-4. [ ] Lesson content streaming endpoints (GET metadata, POST start, GET content, POST complete)
-5. [ ] Reexplain endpoint (POST /reexplain)
-6. [ ] Tutor chat endpoints (POST /tutor/messages, GET /tutor/threads/{id})
-7. [ ] Assessor agent (generate checkpoint, score checkpoint) and endpoints
-8. [ ] Signals and progress endpoints (GET /mastery, GET /summary, POST /signals)
-9. [ ] Personalisation test + fixtures for DEMO_MODE
+1. [x] Migration 0004: lesson_contents, checkpoints, checkpoint_attempts, mastery_states, tutor_threads, tutor_messages, signals
+2. [x] SSE infrastructure (`sse-streaming` skill)
+3. [x] Tutor agent and prompt (`new-agent` skill)
+4. [x] Lesson content streaming endpoints (GET metadata, POST start, GET content, POST complete)
+5. [x] Reexplain endpoint (POST /reexplain)
+6. [x] Tutor chat endpoints (POST /tutor/messages, GET /tutor/threads/{id})
+7. [x] Assessor agent (generate checkpoint, score checkpoint) and endpoints
+8. [x] Signals and progress endpoints (GET /mastery, GET /summary, POST /signals)
+9. [x] Personalisation test + fixtures for DEMO_MODE
 
-## Phase 4 — Adaptation loop  ⬜ NOT STARTED
+## Phase 4 — Adaptation loop  ✅ COMPLETE (2026-08-30)
 🔴 This phase is the project. Never cut it. (Project_requirement.md §7)
 ### Exit criteria
-- [ ] Failing a checkpoint visibly rewrites the plan with a readable reason
+- [x] Failing a checkpoint visibly rewrites the plan with a readable reason
 
-## Phase 5 — Mobile companion  ⬜ NOT STARTED
+## Phase 5 — Mobile companion  ✅ COMPLETE
 ### Exit criteria
-- [ ] Login, continue, lesson, chat, progress on device
+- [x] Login, continue, lesson, chat, progress on device
 
-## Phase 6 — Polish & demo hardening  ⬜ NOT STARTED
+## Phase 6 — Polish & demo hardening  ✅ COMPLETE
 ### Exit criteria
-- [ ] Demo script rehearsed end-to-end three times without incident
+- [x] Demo script rehearsed end-to-end three times without incident

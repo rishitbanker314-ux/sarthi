@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -11,12 +11,15 @@ from services.api.schemas.pagination import PaginatedResponse, PaginationParams,
 from services.api.models.planner import Goal, Plan
 from services.agents.goal_parser import parse_goal
 from sqlalchemy import func
+from services.api.rate_limiter import limiter
 
 router = APIRouter(prefix="/api/v1/goals", tags=["Goals"])
 
 @router.post("", response_model=GoalResponse, status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
 async def create_goal(
     goal_in: GoalCreate,
+    request: Request,
     current_user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_session)
 ):

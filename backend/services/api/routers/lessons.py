@@ -1,5 +1,6 @@
 from typing import Any, List
 import asyncio
+from services.api.rate_limiter import limiter
 import uuid
 from uuid import UUID
 from fastapi import APIRouter, Depends, Request
@@ -10,7 +11,7 @@ from sqlalchemy.orm import selectinload
 from services.api.db import get_session
 from services.api.auth.dependencies import get_current_user, CurrentUser
 from services.api.errors import AppError, NotFoundError
-from services.api.models import Lesson, LessonContent, User, LearnerProfile, Signal
+from services.api.models import Lesson, LessonContent, User, LearnerProfile, Signal, Module, Plan, Goal
 from services.agents.tutor import TutorAgent
 from services.agents.schemas import ContentBlock
 from services.api.schemas.lesson import ReexplainRequest
@@ -21,6 +22,23 @@ from services.api.schemas.signal import SignalCreate, SignalResponse
 router = APIRouter(prefix="/lessons", tags=["lessons"])
 tutor_agent = TutorAgent()
 
+async def get_user_lesson(lesson_id: UUID, user_id: UUID, db: AsyncSession) -> Lesson:
+    query = (
+        select(Lesson)
+        .join(Module)
+        .join(Plan)
+        .join(Goal)
+        .where(
+            Lesson.id == lesson_id,
+            Goal.user_id == user_id
+        )
+    )
+    result = await db.execute(query)
+    lesson = result.scalar_one_or_none()
+    if not lesson:
+        raise NotFoundError("Lesson not found")
+    return lesson
+
 @router.get("/{id}")
 async def get_lesson_metadata(
     id: UUID,
@@ -30,9 +48,7 @@ async def get_lesson_metadata(
     """
     17 GET /api/v1/lessons/{id} - metadata only
     """
-    lesson = await db.get(Lesson, id)
-    if not lesson:
-        raise NotFoundError("Lesson not found")
+    lesson = await get_user_lesson(id, user.id, db)
     
     # Just return basic metadata for now
     return {
@@ -45,17 +61,17 @@ async def get_lesson_metadata(
     }
 
 @router.post("/{id}/start")
+@limiter.limit("10/minute")
 async def start_lesson(
     id: UUID,
+    request: Request,
     db: AsyncSession = Depends(get_session),
     user: CurrentUser = Depends(get_current_user)
 ):
     """
     18 POST /api/v1/lessons/{id}/start - marks in progress, returns thread id
     """
-    lesson = await db.get(Lesson, id)
-    if not lesson:
-        raise NotFoundError("Lesson not found")
+    lesson = await get_user_lesson(id, user.id, db)
         
     if lesson.status == "planned":
         lesson.status = "in_progress"
@@ -66,8 +82,9 @@ async def start_lesson(
 
 async def _stream_lesson_content(lesson_id: UUID, user_id: UUID, db: AsyncSession):
     # Fetch lesson and current profile
-    lesson = await db.get(Lesson, lesson_id)
-    if not lesson:
+    try:
+        lesson = await get_user_lesson(lesson_id, user_id, db)
+    except NotFoundError as e:
         yield "error", {"code": "NOT_FOUND", "message": "Lesson not found"}
         return
         
@@ -174,8 +191,9 @@ async def stream_lesson_content(
 
 async def _stream_reexplain_content(lesson_id: UUID, user_id: UUID, req: ReexplainRequest, db: AsyncSession):
     # Fetch lesson and current profile
-    lesson = await db.get(Lesson, lesson_id)
-    if not lesson:
+    try:
+        lesson = await get_user_lesson(lesson_id, user_id, db)
+    except NotFoundError as e:
         yield "error", {"code": "NOT_FOUND", "message": "Lesson not found"}
         return
         
@@ -257,6 +275,7 @@ async def _stream_reexplain_content(lesson_id: UUID, user_id: UUID, req: Reexpla
         yield "error", {"code": "INTERNAL_ERROR", "message": str(e), "retryable": True}
 
 @router.post("/{id}/reexplain")
+@limiter.limit("5/minute")
 async def reexplain_lesson_block(
     id: UUID,
     req: ReexplainRequest,
@@ -281,9 +300,7 @@ async def complete_lesson(
     """
     20 POST /api/v1/lessons/{id}/complete
     """
-    lesson = await db.get(Lesson, id)
-    if not lesson:
-        raise NotFoundError("Lesson not found")
+    lesson = await get_user_lesson(id, user.id, db)
         
     lesson.status = "completed"
     await db.commit()
@@ -300,9 +317,7 @@ async def create_lesson_signal(
     """
     25 POST /api/v1/lessons/{id}/signals
     """
-    lesson = await db.get(Lesson, id)
-    if not lesson:
-        raise NotFoundError("Lesson not found")
+    lesson = await get_user_lesson(id, user.id, db)
 
     new_signal = Signal(
         user_id=user.id,

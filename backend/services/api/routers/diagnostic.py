@@ -1,6 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends
-
+from fastapi import APIRouter, Depends, Request
+from services.api.rate_limiter import limiter
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.api.db import get_session
 from services.api.auth.dependencies import get_current_user, CurrentUser
@@ -26,13 +26,15 @@ async def resume_diagnostic_session(
     return await diagnostic.resume_session(session_id, current_user.id, db)
 
 @router.post("/sessions/{session_id}/answer", response_model=DiagnosticActionResponse, status_code=200)
+@limiter.limit("10/minute")
 async def answer_diagnostic_question(
     session_id: uuid.UUID,
-    request: DiagnosticAnswerRequest,
+    request_body: DiagnosticAnswerRequest,
+    request: Request,
     current_user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_session)
 ):
-    return await diagnostic.answer_question(session_id, current_user.id, request.answer, db)
+    return await diagnostic.answer_question(session_id, current_user.id, request_body.answer, db)
 
 @router.post("/sessions/{session_id}/complete", response_model=LearnerProfileResponse, status_code=200)
 async def complete_diagnostic_session(

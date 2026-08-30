@@ -1,6 +1,6 @@
 import asyncio
 import time
-import logging
+import structlog
 from pathlib import Path
 from typing import Callable, Any
 from pydantic import BaseModel, ValidationError
@@ -9,7 +9,7 @@ from services.agents.client import generate_content_async
 from services.agents.usage import usage_stats
 from services.api.config import get_settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()
 
 async def run(
     agent_name: str,
@@ -94,6 +94,14 @@ async def run(
                         json.dump(response.parsed.model_dump(mode="json"), f, indent=2)
                     logger.info(f"Recorded fixture to {fixture_path}")
                     
+                logger.info(
+                    "agent_success",
+                    agent=agent_name,
+                    latency_ms=latency_ms,
+                    tokens_in=total_input_tokens,
+                    tokens_out=total_output_tokens
+                )
+                    
                 return response.parsed
                 
             raise ValueError("No parsed response returned")
@@ -104,11 +112,11 @@ async def run(
             if attempts < max_attempts:
                 retried = True
                 error_msg = str(e)
-                logger.error(f"Error in base.py attempt {attempts}: {e}", exc_info=True)
+                logger.error("agent_retry", agent=agent_name, attempt=attempts, error=error_msg, exc_info=True)
                 current_prompt = f"{prompt}\n\nValidation failed with error:\n{error_msg}\n\nPlease fix the JSON and try again."
                 continue
             else:
-                logger.error(f"Error in base.py final attempt: {e}", exc_info=True)
+                logger.error("agent_failed", agent=agent_name, error=str(e), exc_info=True)
                 break
     
     # 6. Fallback
@@ -116,7 +124,7 @@ async def run(
     latency_ms = int((time.time() - start_time) * 1000)
     await usage_stats.record(agent_name, model_tier, total_input_tokens, total_output_tokens, latency_ms, retried, fell_back)
     
-    logger.error("Agent %s fell back after %d attempts", agent_name, attempts)
+    logger.warning("agent_fallback", agent=agent_name, attempts=attempts, latency_ms=latency_ms)
     
     if fallback_factory:
         return fallback_factory()

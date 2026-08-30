@@ -24,7 +24,7 @@ async def _stream_tutor_reply(user_id: UUID, req: TutorMessageRequest, db: Async
     # Fetch thread or create new
     if req.thread_id:
         thread = await db.get(TutorThread, req.thread_id)
-        if not thread:
+        if not thread or thread.user_id != user_id:
             yield "error", {"code": "NOT_FOUND", "message": "Thread not found"}
             return
     else:
@@ -150,7 +150,7 @@ async def get_tutor_thread(
     22 GET /api/v1/tutor/threads/{id}
     """
     thread = await db.execute(
-        select(TutorThread).options(selectinload(TutorThread.messages)).where(TutorThread.id == id)
+        select(TutorThread).options(selectinload(TutorThread.messages)).where(TutorThread.id == id, TutorThread.user_id == user.id)
     )
     thread_obj = thread.scalar_one_or_none()
     

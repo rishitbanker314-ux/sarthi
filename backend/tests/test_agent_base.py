@@ -155,8 +155,8 @@ async def test_demo_mode_fallback():
     
     stats = await usage_stats.get_all()
     assert stats["_smoke"]["calls"] == 1
-    assert stats["_smoke"]["input_tokens"] == 10 # Hardcoded in _FakeResponse
-    assert stats["_smoke"]["output_tokens"] == 10
+    assert stats["_smoke"]["input_tokens"] == 1200 # Hardcoded in _FakeResponse
+    assert stats["_smoke"]["output_tokens"] == 450
     
     # Restore
     settings.demo_mode = False

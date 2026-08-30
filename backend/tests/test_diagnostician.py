@@ -1,3 +1,4 @@
+import os
 import pytest
 import json
 from unittest.mock import patch, AsyncMock
@@ -14,6 +15,7 @@ def mock_gemini():
         yield client_instance
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(not os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY") == "fake-key-for-tests", reason="Needs real API key")
 async def test_diagnostician_fallback_sequence():
     """
     Test the fallback sequence by simulating a broken Gemini client (e.g. ValueError).

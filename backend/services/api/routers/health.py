@@ -27,3 +27,18 @@ async def health_check(session: AsyncSession = Depends(get_session)):
         "version": version,
         "env": settings.env
     }
+
+from services.agents.usage import usage_stats
+
+@router.get("/health/usage")
+async def get_usage():
+    stats = await usage_stats.get_all()
+    
+    total_cost_inr = 0.0
+    for agent, data in stats.items():
+        total_cost_inr += data.get("total_cost_inr", 0.0)
+        
+    return {
+        "agents": stats,
+        "total_cost_inr": round(total_cost_inr, 4)
+    }
