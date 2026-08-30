@@ -62,3 +62,17 @@ def token_headers():
     
     token = jwt.encode(payload, settings.dev_jwt_secret, algorithm="HS256")
     return {"Authorization": f"Bearer {token}"}
+
+@pytest_asyncio.fixture
+async def test_user(db_session):
+    from services.api.models.user import User
+    from services.api.routers.dev_auth import dev_user_id
+    email = "test@example.com"
+    uid = dev_user_id(email)
+    
+    user = await db_session.get(User, uid)
+    if not user:
+        user = User(id=uid, email=email, display_name="Test User")
+        db_session.add(user)
+        await db_session.commit()
+    return user

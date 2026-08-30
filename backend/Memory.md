@@ -18,8 +18,8 @@
 | POST | /dev/auth/token | live | yes | Local dev authentication |
 
 ### Database
-Tables that exist: `users`, `alembic_version`, `learner_profiles`, `diagnostic_sessions`, `concepts`.
-Latest applied migration ID: cbe458a6eb04.
+Tables that exist: `users`, `alembic_version`, `learner_profiles`, `diagnostic_sessions`, `concepts`, `goals`, `plans`, `modules`, `lessons`, `jobs`.
+Latest applied migration ID: af22b8f8c1b7.
 
 ### Agents
 | Agent | Status | Prompt file | Schema class | Tested |
@@ -32,20 +32,30 @@ ENV, DEMO_MODE, AUTH_MODE, DATABASE_URL, ALEMBIC_DATABASE_URL, SUPABASE_URL, SUP
 ### Known broken / half-finished
 - None.
 
-### Agents
-| Runtime | live | _test_prompt.md (mocked) | SmokeAnswer | yes |
-| Diagnostician | live | diagnostician.md | DiagnosticResponse | yes |
-
-### Environment variables in use
-ENV, DEMO_MODE, AUTH_MODE, DATABASE_URL, ALEMBIC_DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_JWKS_URL, GEMINI_API_KEY, DEV_JWT_SECRET, CORS_ORIGINS, RECORD_FIXTURES
-
-### Known broken / half-finished
-- None.
-
 ### Do not touch
 - None.
 
 ## CHANGELOG — append at top, never edit past entries
+
+### [2026-08-29 21:20] feat(api): Goal capture and parser (P2.3)
+- Added: `GoalParserAgent` in `services/agents/goal_parser.py` using `gemini-3.7-flash`.
+- Added: Endpoints `POST /api/v1/goals`, `GET /api/v1/goals`, `PATCH /api/v1/goals/{id}`.
+- Added: Tests covering success, validation, prompt injection, and patching limits in `tests/test_goals.py`.
+- Added: Fixture `fixtures/demo/goal_parser_default.json` for offline fallback.
+- Changed: Updated OpenAPI schema and `contract/status.md`.
+- Tested: Prompt injection test handles inputs as data properly without crashing.
+- Broken/left undone: None.
+- Next: Planner prompt + structured output schema (P2.5).
+
+
+### [2026-08-29 21:02] feat(db): Migration 0003 for Planner Phase 2
+- Added: SQLAlchemy models `Goal`, `Plan`, `Module`, `Lesson`, `Job` in `services/api/models/planner.py`.
+- Added: Enums `JobKind`, `JobStatus` to `services/api/models/enums.py`.
+- Added: Alembic migration `af22b8f8c1b7` containing tables: goals, plans, modules, lessons, jobs.
+- Changed: `ALEMBIC_DATABASE_URL` in `.env` to use `psycopg` instead of `psycopg2` driver.
+- Tested: `alembic upgrade head` applies cleanly.
+- Broken/left undone: None.
+- Next: Goal parser agent + prompt.
 
 ### [2026-08-29 15:56] feat(api): Learner Profile endpoints (P1.8)
 - Added: `services/api/routers/profile.py`.

@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from services.api.routers import health, dev_auth, me, diagnostic, profile
+from services.api.routers import health, dev_auth, me, diagnostic, profile, goals, jobs, plans, lessons, tutor, checkpoints, adaptation
 from services.api.errors import AppError
 from services.api.config import get_settings
 
@@ -81,8 +81,17 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 app.include_router(health.router)
+app.include_router(checkpoints.router)
+app.include_router(lessons.router, prefix="/api/v1")
+app.include_router(tutor.router, prefix="/api/v1")
 app.include_router(me.router, prefix="/api/v1")
 app.include_router(diagnostic.router)
 app.include_router(profile.router)
+app.include_router(goals.router)
+app.include_router(jobs.router)
+app.include_router(plans.router)
+app.include_router(adaptation.router, prefix="/api/v1")
 if settings.env != "production":
+    from services.api.routers import dev_health
     app.include_router(dev_auth.router)
+    app.include_router(dev_health.router)

@@ -9,6 +9,7 @@ class UsageStats:
     async def record(
         self,
         agent_name: str,
+        model_tier: str,
         input_tokens: int,
         output_tokens: int,
         latency_ms: int,
@@ -19,6 +20,7 @@ class UsageStats:
             if agent_name not in self._stats:
                 self._stats[agent_name] = {
                     "calls": 0,
+                    "model_tier": model_tier,
                     "input_tokens": 0,
                     "output_tokens": 0,
                     "latency_ms": 0,
@@ -28,6 +30,7 @@ class UsageStats:
             
             s = self._stats[agent_name]
             s["calls"] += 1
+            s["model_tier"] = model_tier # Update in case it changes
             s["input_tokens"] += input_tokens
             s["output_tokens"] += output_tokens
             s["latency_ms"] += latency_ms

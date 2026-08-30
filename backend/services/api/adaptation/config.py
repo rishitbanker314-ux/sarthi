@@ -1,0 +1,17 @@
+"""
+Configuration constants for adaptation trigger evaluation.
+These can be tuned during rehearsal without touching the logic.
+"""
+
+STRUGGLING_SCORE_THRESHOLD = 0.5
+STRUGGLING_CONSECUTIVE_THRESHOLD = 0.7
+STRUGGLING_CONSECUTIVE_COUNT = 2
+
+STUCK_CONFUSION_COUNT = 2
+
+RACING_SCORE_THRESHOLD = 0.9
+RACING_CONSECUTIVE_COUNT = 2
+RACING_TIME_RATIO = 0.6
+
+STALLED_DAYS = 3
+COOLDOWN_MINUTES = 30

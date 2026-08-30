@@ -48,7 +48,20 @@ GET /health - No auth, returns version + db status
 (All other endpoints not built yet)
 
 ## A5. Agent layer
-Not built yet.
+- **Bounding size**: The prompt enforces a hard maximum on the number of modules and lessons (e.g. max 5 modules, max 5 lessons each). For massive goals, the LLM is instructed to chunk the domain and focus only on the foundational slice to get started, rather than generating the entire curriculum.
+- **Vague/Non-educational goals**: The Planner agent contains a strict classification gate. If a goal is deemed non-educational or impossible, it refuses to generate a plan and instead sets the job status to `failed_validation` with a helpful clarification message for the user, preventing junk plans.
+- **Generic rationale avoidance**: The rationale must directly cite specific traits from the `LearnerProfile` (e.g. "Because you prefer concrete examples, we start with a hands-on project"). The LLM prompt explicitly forbids generic filler.
+- **Deciding prerequisites**: We rely on the LLM's vast parametric knowledge of the domain to implicitly sequence topics from foundational to advanced, using standard pedagogical dependencies, since we don't have a rigid concept graph yet.
+- **Partial failure mid-generation**: Plan generation happens within a single atomic database transaction. If the generation or parsing fails midway, the transaction rolls back so we never save a half-baked plan. The async job status is updated to `failed` and can be retried or surfaced.
+- **Existing mastery**: The `LearnerProfile` includes the user's prior knowledge. The Planner prompt strictly instructs the LLM to skip basics and start the plan at an advanced level if prior mastery is detected.
+
+### Adaptor Agent & Re-planning
+- **Firing on noise**: We use trailing windows of multiple signals (e.g. 3 consecutive failures, multiple confusion flags) to trigger adaptations, rather than single data points.
+- **Declined adaptations**: We force adaptation if the user declines but immediately fails again, as the data proves they are stuck.
+- **Honest reasoning**: The Adaptor agent outputs a structured before/after diff. The API layer asserts that the generated plain-language reason directly correlates with the structural changes.
+- **Completed lessons**: Completed lessons are immutable and retained in the new plan. Re-planning only sequences and structures un-started lessons.
+- **Cache invalidation**: The cache key for lesson content includes the `plan_id`. When a plan changes, the `plan_id` changes, cleanly invalidating the cache for un-started lessons.
+- **Explainability**: For skeptical judges, we build an admin/demo view showing raw signals, crossed thresholds, the exact before/after JSON of the plan, and the generated reason side by side.
 
 ## A6. Async job model
 Not built yet.

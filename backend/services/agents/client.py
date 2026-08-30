@@ -41,9 +41,9 @@ class _FakeResponse:
     def __init__(self, parsed: BaseModel):
         self.parsed = parsed
         self.usage_metadata = types.GenerateContentResponseUsageMetadata(
-            prompt_token_count=10,
-            candidates_token_count=10,
-            total_token_count=20
+            prompt_token_count=1200,
+            candidates_token_count=450,
+            total_token_count=1650
         )
 
 async def generate_content_async(

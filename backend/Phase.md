@@ -34,13 +34,44 @@
 ### Blocked
 - (nothing)
 
-## Phase 2 — Goal → Plan  ⬅ CURRENT
+## Phase 2 — Goal → Plan  ✅ COMPLETE (2026-08-29)
 ### Exit criteria
-- [ ] A typed goal produces a real plan with a real rationale, live on both apps
+- [x] POST /goals parses free text into normalized_topic/target_level/deadline
+- [x] Planner agent returns schema-valid PlanDraft in ≤90s p95
+- [x] Plan/Module/Lesson persisted and versioned
+- [x] Rationale references the learner's actual profile fields
+- [x] Job polling reports real progress, not a fake bar
+- [x] All Phase-2 endpoints marked live in contract/status.md
+- [x] Memory.md STATE updated
 
-## Phase 3 — Lesson & checkpoint  ⬜ NOT STARTED
+### Task queue (ordered — take the top unchecked item)
+1. [x] Pydantic models: Goal, PlanDraft, ModuleDraft, LessonDraft
+2. [x] Migration 0003: goals, plans, modules, lessons
+3. [x] Goal parser agent + prompt
+4. [x] POST /api/v1/goals (and GET, PATCH)
+5. [x] Planner prompt + structured output schema
+6. [x] Job dispatch for plan generation
+7. [x] GET /api/v1/plans/{id}
+8. [x] Fixture responses for DEMO_MODE
+9. [x] Regenerate openapi.yaml, log contract change, notify FE
+
+### Blocked
+- (nothing)
+
+## Phase 3 — Lesson & checkpoint  ⬅ CURRENT
 ### Exit criteria
 - [ ] A lesson is generated, streamed, rendered and assessed; mastery moves
+
+### Task queue (ordered)
+1. [ ] Migration 0004: lesson_contents, checkpoints, checkpoint_attempts, mastery_states, tutor_threads, tutor_messages, signals
+2. [ ] SSE infrastructure (`sse-streaming` skill)
+3. [ ] Tutor agent and prompt (`new-agent` skill)
+4. [ ] Lesson content streaming endpoints (GET metadata, POST start, GET content, POST complete)
+5. [ ] Reexplain endpoint (POST /reexplain)
+6. [ ] Tutor chat endpoints (POST /tutor/messages, GET /tutor/threads/{id})
+7. [ ] Assessor agent (generate checkpoint, score checkpoint) and endpoints
+8. [ ] Signals and progress endpoints (GET /mastery, GET /summary, POST /signals)
+9. [ ] Personalisation test + fixtures for DEMO_MODE
 
 ## Phase 4 — Adaptation loop  ⬜ NOT STARTED
 🔴 This phase is the project. Never cut it. (Project_requirement.md §7)

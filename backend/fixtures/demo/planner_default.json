@@ -1,0 +1,63 @@
+{
+    "title": "Default Python Learning Plan",
+    "rationale": "Since DEMO_MODE is true, here is a default plan. Because your `session_minutes` is 20, we have kept lessons under 20 mins. Because your `depth_pref` is breadth_survey, we are covering 3 modules.",
+    "modules": [
+        {
+            "title": "Module 1: Introduction",
+            "objective": "Understand the basics of Python.",
+            "rationale": "A strong foundation is key.",
+            "lessons": [
+                {
+                    "title": "Variables and Data Types",
+                    "objective": "Learn to store data.",
+                    "concept_names": ["variables", "integers", "strings"],
+                    "est_minutes": 15
+                },
+                {
+                    "title": "Control Flow",
+                    "objective": "Learn if/else statements.",
+                    "concept_names": ["if statements", "booleans"],
+                    "est_minutes": 20
+                }
+            ]
+        },
+        {
+            "title": "Module 2: Data Structures",
+            "objective": "Learn to organize data.",
+            "rationale": "Essential for complex programs.",
+            "lessons": [
+                {
+                    "title": "Lists and Tuples",
+                    "objective": "Store multiple items.",
+                    "concept_names": ["lists", "tuples"],
+                    "est_minutes": 15
+                },
+                {
+                    "title": "Dictionaries",
+                    "objective": "Store key-value pairs.",
+                    "concept_names": ["dictionaries", "keys", "values"],
+                    "est_minutes": 15
+                }
+            ]
+        },
+        {
+            "title": "Module 3: Functions",
+            "objective": "Learn to reuse code.",
+            "rationale": "Functions make code modular.",
+            "lessons": [
+                {
+                    "title": "Defining Functions",
+                    "objective": "Create your own functions.",
+                    "concept_names": ["functions", "def", "return"],
+                    "est_minutes": 20
+                },
+                {
+                    "title": "Arguments and Parameters",
+                    "objective": "Pass data into functions.",
+                    "concept_names": ["arguments", "parameters", "kwargs"],
+                    "est_minutes": 20
+                }
+            ]
+        }
+    ]
+}

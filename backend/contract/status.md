@@ -1,5 +1,17 @@
 # Contract Status
 
+## v0.3 — Phase 2 Partial (Goal Capture) (2026-08-29)
+
+### New Endpoints (added in Phase 2)
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/goals` | Capture and parse a new learner goal |
+| GET | `/api/v1/goals` | List all goals for the current user |
+| PATCH | `/api/v1/goals/{id}` | Correct parsed goal fields before planning |
+| GET | `/api/v1/jobs/{id}` | Get status and result of an async background job |
+
+---
+
 ## v0.2 — Phase 1 Complete (2026-08-29)
 
 ### New Endpoints (added in Phase 1)

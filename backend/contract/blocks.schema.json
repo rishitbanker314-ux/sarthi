@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContentBlock",
+  "description": "A single renderable block of lesson content.",
+  "type": "object",
+  "discriminator": {
+    "propertyName": "type"
+  },
+  "required": ["id", "type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^blk_[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    },
+    "type": {
+      "type": "string"
+    },
+    "concept_id": {
+      "type": ["string", "null"],
+      "format": "uuid"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "type": { "const": "heading" },
+        "text": { "type": "string" },
+        "level": { "type": "integer", "minimum": 1, "maximum": 3 }
+      },
+      "required": ["text", "level"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174000",
+          "type": "heading",
+          "concept_id": null,
+          "text": "Introduction to Python",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "text" },
+        "text": { "type": "string" }
+      },
+      "required": ["text"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174001",
+          "type": "text",
+          "concept_id": null,
+          "text": "Python is a **dynamically typed** language, meaning you don't need to declare variable types explicitly."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "list" },
+        "ordered": { "type": "boolean" },
+        "items": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["ordered", "items"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174002",
+          "type": "list",
+          "concept_id": null,
+          "ordered": false,
+          "items": ["Readable syntax", "Large ecosystem", "Cross-platform"]
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "code" },
+        "language": { "type": "string" },
+        "code": { "type": "string" },
+        "caption": { "type": "string" }
+      },
+      "required": ["language", "code"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174003",
+          "type": "code",
+          "concept_id": null,
+          "language": "python",
+          "code": "def hello():\n    print('Hello World!')",
+          "caption": "A simple greeting function"
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "math" },
+        "latex": { "type": "string" },
+        "display": { "type": "boolean" }
+      },
+      "required": ["latex", "display"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174004",
+          "type": "math",
+          "concept_id": null,
+          "latex": "E = mc^2",
+          "display": true
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "callout" },
+        "variant": { "type": "string", "enum": ["info", "tip", "warning", "misconception", "ai_notice"] },
+        "title": { "type": "string" },
+        "text": { "type": "string" }
+      },
+      "required": ["variant", "title", "text"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174005",
+          "type": "callout",
+          "concept_id": null,
+          "variant": "misconception",
+          "title": "Wait, is == the same as =?",
+          "text": "No, `=` is for assignment, while `==` is used to compare values."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "example" },
+        "title": { "type": "string" },
+        "setup": { "type": "string" },
+        "steps": { "type": "array", "items": { "type": "string" } },
+        "result": { "type": "string" }
+      },
+      "required": ["title", "setup", "steps", "result"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174006",
+          "type": "example",
+          "concept_id": null,
+          "title": "Adding two numbers",
+          "setup": "We want to add 5 and 3.",
+          "steps": ["Take 5.", "Add 3 to it."],
+          "result": "We get 8."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "analogy" },
+        "text": { "type": "string" },
+        "maps_to": { "type": "string" }
+      },
+      "required": ["text", "maps_to"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174007",
+          "type": "analogy",
+          "concept_id": null,
+          "text": "Think of a variable as a labeled box where you can store things.",
+          "maps_to": "The label is the variable name, and the thing inside is the value."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "step" },
+        "index": { "type": "integer" },
+        "text": { "type": "string" },
+        "reveal": { "type": "boolean" }
+      },
+      "required": ["index", "text", "reveal"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174008",
+          "type": "step",
+          "concept_id": null,
+          "index": 1,
+          "text": "First, we declare the variable.",
+          "reveal": true
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "quiz_inline" },
+        "question": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "answer_index": { "type": "integer" },
+        "explanation": { "type": "string" }
+      },
+      "required": ["question", "options", "answer_index", "explanation"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-426614174009",
+          "type": "quiz_inline",
+          "concept_id": null,
+          "question": "Which of these is a Python data type?",
+          "options": ["int", "number", "digit"],
+          "answer_index": 0,
+          "explanation": "Python uses `int` for integers."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "image_prompt" },
+        "alt": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["alt", "description"],
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-42661417400a",
+          "type": "image_prompt",
+          "concept_id": null,
+          "alt": "A diagram of a CPU",
+          "description": "Show the ALU and Registers interacting."
+        }
+      ]
+    },
+    {
+      "properties": {
+        "type": { "const": "divider" }
+      },
+      "examples": [
+        {
+          "id": "blk_123e4567-e89b-12d3-a456-42661417400b",
+          "type": "divider",
+          "concept_id": null
+        }
+      ]
+    }
+  ]
+}

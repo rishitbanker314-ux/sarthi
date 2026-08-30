@@ -7,6 +7,7 @@ from pydantic import BaseModel, ValidationError
 
 from services.agents.client import generate_content_async
 from services.agents.usage import usage_stats
+from services.api.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +41,10 @@ async def run(
     # 2. Setup timeouts and model id
     if model_tier.lower() == "flash":
         timeout = 20.0
-        model_id = "gemini-3.7-flash" # Default flash, can pull from models.py
+        model_id = "gemini-2.5-flash"
     else:
         timeout = 110.0
-        model_id = "gemini-3.1-pro-preview"
+        model_id = "gemini-2.5-pro"
     
     attempts = 0
     max_attempts = 2
@@ -78,7 +79,21 @@ async def run(
             if response.parsed:
                 # pydantic validates during SDK parsing, but we double check or just return
                 latency_ms = int((time.time() - start_time) * 1000)
-                await usage_stats.record(agent_name, total_input_tokens, total_output_tokens, latency_ms, retried, fell_back)
+                await usage_stats.record(agent_name, model_tier, total_input_tokens, total_output_tokens, latency_ms, retried, fell_back)
+                
+                settings = get_settings()
+                if settings.record_fixtures:
+                    import json
+                    import hashlib
+                    # Use a hash of prompt + context keys to somewhat identify the fixture
+                    fixture_name = f"{agent_name}_default.json"
+                    fixture_dir = Path(__file__).parent.parent.parent / "fixtures" / "demo"
+                    fixture_dir.mkdir(parents=True, exist_ok=True)
+                    fixture_path = fixture_dir / fixture_name
+                    with open(fixture_path, "w") as f:
+                        json.dump(response.parsed.model_dump(mode="json"), f, indent=2)
+                    logger.info(f"Recorded fixture to {fixture_path}")
+                    
                 return response.parsed
                 
             raise ValueError("No parsed response returned")
@@ -89,15 +104,17 @@ async def run(
             if attempts < max_attempts:
                 retried = True
                 error_msg = str(e)
+                logger.error(f"Error in base.py attempt {attempts}: {e}", exc_info=True)
                 current_prompt = f"{prompt}\n\nValidation failed with error:\n{error_msg}\n\nPlease fix the JSON and try again."
                 continue
             else:
+                logger.error(f"Error in base.py final attempt: {e}", exc_info=True)
                 break
     
     # 6. Fallback
     fell_back = True
     latency_ms = int((time.time() - start_time) * 1000)
-    await usage_stats.record(agent_name, total_input_tokens, total_output_tokens, latency_ms, retried, fell_back)
+    await usage_stats.record(agent_name, model_tier, total_input_tokens, total_output_tokens, latency_ms, retried, fell_back)
     
     logger.error("Agent %s fell back after %d attempts", agent_name, attempts)
     

@@ -1,0 +1,16 @@
+{
+  "trigger": "struggling",
+  "action": "insert_prerequisite",
+  "reason": "You scored 40% on recursion base cases, and three of your next four lessons assume them. I've added a 15-minute recursion fundamentals lesson before Trees so those lessons land.",
+  "timeline_impact": "adds about 15 minutes; you're still on track for 12 October",
+  "changes": [
+    {
+      "module_id": "00000000-0000-0000-0000-000000000000",
+      "lesson_id": null,
+      "change_type": "insert",
+      "details": {
+        "concept": "recursion base cases"
+      }
+    }
+  ]
+}
