@@ -19,7 +19,7 @@ cd backend
 uv run alembic upgrade head
 
 # 3. Start the API in DEMO_MODE
-DEMO_MODE=true RECORD_FIXTURES=false uv run fastapi dev services/api/main.py --port 8001
+DEMO_MODE=true RECORD_FIXTURES=false uv run fastapi dev services/api/main.py --port 8000
 ```
 
 ## 2. Seeding the Demo User

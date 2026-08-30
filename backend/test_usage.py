@@ -53,7 +53,7 @@ async def run():
         uid = str(uuid.uuid5(NAMESPACE_DEV_AUTH, email.lower()))
         await create_user_if_not_exists(email, uid)
 
-        resp = await client.post("http://127.0.0.1:8001/dev/auth/token", json={"email": email})
+        resp = await client.post("http://127.0.0.1:8000/dev/auth/token", json={"email": email})
         resp.raise_for_status()
         token = resp.json()["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
@@ -61,7 +61,7 @@ async def run():
         # 1. Start a goal
         print("Starting goal...")
         resp = await client.post(
-            "http://127.0.0.1:8001/api/v1/goals",
+            "http://127.0.0.1:8000/api/v1/goals",
             json={"raw_input": "I want to learn async programming."},
             headers=headers
         )
@@ -74,21 +74,21 @@ async def run():
         
         # 3. Create a plan
         print("Triggering plan generation...")
-        resp = await client.post(f"http://127.0.0.1:8001/api/v1/goals/{goal_id}/plan", headers=headers)
+        resp = await client.post(f"http://127.0.0.1:8000/api/v1/goals/{goal_id}/plan", headers=headers)
         if resp.status_code != 202:
             print("Failed to trigger plan:", resp.text)
             return
 
         print("Polling plan status...")
         while True:
-            resp = await client.get(f"http://127.0.0.1:8001/api/v1/plans/{goal_id}", headers=headers)
+            resp = await client.get(f"http://127.0.0.1:8000/api/v1/plans/{goal_id}", headers=headers)
             if resp.status_code == 200:
                 print("Plan generation complete!")
                 break
             time.sleep(1)
             
         # Get Usage
-        resp = await client.get("http://127.0.0.1:8001/health/usage")
+        resp = await client.get("http://127.0.0.1:8000/health/usage")
         print(resp.json())
 
 if __name__ == "__main__":

@@ -51,14 +51,14 @@ async def run():
         uid = str(uuid.uuid5(NAMESPACE_DEV_AUTH, email.lower()))
         await create_user_if_not_exists(email, uid)
 
-        resp = await client.post("http://127.0.0.1:8001/dev/auth/token", json={"email": email})
+        resp = await client.post("http://127.0.0.1:8000/dev/auth/token", json={"email": email})
         resp.raise_for_status()
         token = resp.json()["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
         print("Starting goal...")
         resp = await client.post(
-            "http://127.0.0.1:8001/api/v1/goals",
+            "http://127.0.0.1:8000/api/v1/goals",
             json={"raw_input": "I want to learn async programming."},
             headers=headers
         )
