@@ -13,6 +13,19 @@ paths:
           content:
             application/json:
               schema: {}
+  /health/usage:
+    get:
+      tags:
+      - Health
+      summary: Get Usage
+      operationId: get_usage_health_usage_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
   /api/v1/lessons/{lesson_id}/checkpoint:
     post:
       tags:
@@ -321,7 +334,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/users/me:
+  /api/v1/me:
     get:
       tags:
       - me
@@ -329,7 +342,7 @@ paths:
       description: 'Get the current learner''s profile.
 
         Lazily creates a new profile record if this is the learner''s first request.'
-      operationId: get_me_api_v1_users_me_get
+      operationId: get_me_api_v1_me_get
       responses:
         '200':
           description: Successful Response
@@ -859,19 +872,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /health/usage:
-    get:
-      tags:
-      - Health
-      summary: Get Usage
-      operationId: get_usage_health_usage_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsageResponse'
 components:
   schemas:
     Accessibility:
