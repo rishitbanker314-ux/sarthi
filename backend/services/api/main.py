@@ -4,39 +4,29 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from services.api.routers import health, dev_auth, me, diagnostic, profile, goals, jobs, plans, lessons, tutor, checkpoints, adaptation
 from services.api.errors import AppError
 from services.api.config import get_settings
+from services.api.middleware import RequestLoggingMiddleware, SecurityHeadersMiddleware
 
 logger = structlog.get_logger()
 
 app = FastAPI(title="Sarathi API", version="0.1.0")
 settings = get_settings()
 
-@app.middleware("http")
-async def global_middleware(request: Request, call_next):
-    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
-    request.state.request_id = request_id
-    
-    try:
-        response = await call_next(request)
-    except Exception as exc:
-        logger.exception("Unhandled exception", exc_info=exc, path=request.url.path)
-        response = JSONResponse(
-            status_code=500,
-            content={
-                "error": {
-                    "code": "INTERNAL_ERROR",
-                    "message": "Something went wrong on our end.",
-                    "retryable": True,
-                    "details": {},
-                }
-            },
-        )
-    
-    response.headers["X-Request-ID"] = request_id
-    return response
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
+
+cors_origins = [origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError):

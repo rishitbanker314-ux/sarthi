@@ -1,6 +1,20 @@
 {
-  "dialogue_act": "complete",
+  "complete": true,
   "question": null,
-  "confidence": 1.0,
-  "reasoning": "Fallback default generated in demo mode."
+  "profile_draft": {
+    "prior_knowledge": "solid",
+    "pace": "fast",
+    "representation_pref": "abstract_first",
+    "scaffolding_pref": "guided_discovery",
+    "depth_pref": "depth_mastery",
+    "motivation": "career",
+    "session_minutes": 60,
+    "language": "en",
+    "accessibility": {
+      "font_scale": 1.0,
+      "reduced_motion": false,
+      "screen_reader": false,
+      "dyslexia_font": false
+    }
+  }
 }

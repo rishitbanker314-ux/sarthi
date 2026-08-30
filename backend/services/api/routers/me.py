@@ -10,9 +10,9 @@ from services.api.services.users import get_or_create_user
 from services.api.models.lesson_execution import Signal, MasteryState
 from typing import List
 
-router = APIRouter(prefix="/users/me", tags=["me"])
+router = APIRouter(tags=["me"])
 
-@router.get("", response_model=MeResponse)
+@router.get("/me", response_model=MeResponse)
 async def get_me(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -44,7 +44,7 @@ async def get_me(
         profile_version=profile.profile_version if profile else None,
     )
 
-@router.get("/signals", response_model=List[SignalResponse])
+@router.get("/users/me/signals", response_model=List[SignalResponse])
 async def get_my_signals(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
@@ -72,7 +72,7 @@ async def get_my_signals(
         ) for s in signals
     ]
 
-@router.get("/progress", response_model=List[MasteryStateResponse])
+@router.get("/users/me/progress", response_model=List[MasteryStateResponse])
 async def get_my_progress(
     current_user: CurrentUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
