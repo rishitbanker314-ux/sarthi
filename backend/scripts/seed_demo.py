@@ -73,7 +73,6 @@ async def seed_demo_user():
                 
                 # Create Plan
                 plan = Plan(
-                    user_id=demo_user.id,
                     goal_id=goal.id,
                     version=1,
                     title="DSA Mastery",
