@@ -1,0 +1,17 @@
+{
+  "name": "sarathi",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "gen:types": "openapi-typescript contract/openapi.yaml -o packages/api-types/index.ts",
+    "mock": "npx @stoplight/prism-cli mock contract/openapi.yaml --port 4010"
+  },
+  "devDependencies": {
+    "turbo": "^2.1.0",
+    "openapi-typescript": "^7.3.0",
+    "typescript": "^5.5.0"
+  }
+}
