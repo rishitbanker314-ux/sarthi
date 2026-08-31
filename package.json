@@ -1,6 +1,7 @@
 {
   "name": "sarathi",
   "private": true,
+  "packageManager": "pnpm@11.24.0",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
