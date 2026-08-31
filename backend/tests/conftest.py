@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 import os
 os.environ["DEV_JWT_SECRET"] = "test-secret"
 os.environ["AUTH_MODE"] = "local"
+os.environ["DEMO_MODE"] = "false"
 os.environ["SUPABASE_JWKS_URL"] = "http://fake"
 os.environ["ALEMBIC_DATABASE_URL"] = "postgresql+asyncpg://sarathi:sarathi@localhost:5432/sarathi"
 

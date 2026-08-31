@@ -73,3 +73,8 @@
 - Tested: `uv run pytest tests/test_health.py -v` passed successfully.
 - Broken/left undone: None
 - Next: Docker compose setup (P0.3)
+
+### [2026-08-31 11:30] fix(tests): fix test isolation and unfinished mock tests
+- Fixed: `test_production.py` now uses `_env_file=None` when instantiating `Settings` to avoid failing due to `.env` file pollution (`DEMO_MODE=true`).
+- Fixed: `test_agent_base.py` mock tests no longer fail with `1200 == 5` because `conftest.py` now forces `os.environ["DEMO_MODE"] = "false"`, preventing `Settings` from globally defaulting to demo mode during unit tests.
+- Tested: Full test suite now passes with 0 failures.

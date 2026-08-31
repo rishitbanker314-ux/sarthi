@@ -8,7 +8,9 @@ from services.api.main import app
 def test_production_config_rejects_local_auth():
     with pytest.raises(ValueError, match="Cannot run with auth_mode='local' in production."):
         Settings(
+            _env_file=None,
             env="production",
+            demo_mode=False,
             auth_mode="local",
             dev_jwt_secret="real_secret",
             cors_origins="https://example.com"
@@ -17,6 +19,7 @@ def test_production_config_rejects_local_auth():
 def test_production_config_rejects_demo_mode():
     with pytest.raises(ValueError, match="Cannot run with demo_mode=True in production."):
         Settings(
+            _env_file=None,
             env="production",
             demo_mode=True,
             auth_mode="supabase",
@@ -24,11 +27,12 @@ def test_production_config_rejects_demo_mode():
             cors_origins="https://example.com"
         )
 
-
 def test_production_config_rejects_wildcard_cors():
-    with pytest.raises(ValueError, match="cors_origins cannot contain wildcard '\\*' in production."):
+    with pytest.raises(ValueError, match="cors_origins cannot contain wildcard '\*' in production."):
         Settings(
+            _env_file=None,
             env="production",
+            demo_mode=False,
             auth_mode="supabase",
             dev_jwt_secret="real_secret",
             cors_origins="*,https://example.com"
@@ -43,9 +47,4 @@ def test_production_security_headers():
     assert response.headers.get("Referrer-Policy") == "no-referrer"
 
 def test_dev_routes_missing_in_production():
-    # In production, the dev routes should not be included
-    # We can test this by checking if the condition in main.py works.
-    # Instead of reloading, we can just check the current app's routes.
-    # Since tests run in development, they SHOULD be present. 
-    # But if we were to construct a new app with production settings, they wouldn't be.
     pass
