@@ -79,12 +79,20 @@ async def run():
             print("Failed to trigger plan:", resp.text)
             return
 
+        data = resp.json()
+        job_id = data["job_id"]
+
         print("Polling plan status...")
         while True:
-            resp = await client.get(f"http://127.0.0.1:8000/api/v1/plans/{goal_id}", headers=headers)
+            resp = await client.get(f"http://127.0.0.1:8000/api/v1/jobs/{job_id}", headers=headers)
             if resp.status_code == 200:
-                print("Plan generation complete!")
-                break
+                job_data = resp.json()
+                if job_data["status"] == "succeeded":
+                    print("Plan generation complete!")
+                    break
+                elif job_data["status"] in ["failed", "cancelled"]:
+                    print("Plan generation failed:", job_data)
+                    return
             time.sleep(1)
             
         # Get Usage

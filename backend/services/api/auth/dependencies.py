@@ -20,7 +20,7 @@ async def get_current_user(
     settings: Settings = Depends(get_settings)
 ) -> CurrentUser:
     if not credentials:
-        raise AppError("TOKEN_INVALID", "Missing authentication token", http_status=401)
+        raise AppError(code="TOKEN_INVALID", message="Missing authentication token", http_status=401)
         
     token = credentials.credentials
     
@@ -29,6 +29,6 @@ async def get_current_user(
     elif settings.auth_mode == "local":
         claims = verify_local_token(token)
     else:
-        raise AppError("TOKEN_INVALID", "Invalid auth mode configured", http_status=401)
+        raise AppError(code="TOKEN_INVALID", message="Invalid auth mode configured", http_status=401)
         
     return CurrentUser(id=claims.sub, email=claims.email)

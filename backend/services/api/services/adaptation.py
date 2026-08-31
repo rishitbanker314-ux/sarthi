@@ -46,7 +46,7 @@ async def respond_to_adaptation(
         raise NotFoundError("Adaptation event not found")
         
     if event.accepted is not None:
-        raise AppError("BAD_REQUEST", "Adaptation event has already been responded to", False)
+        raise AppError(code="BAD_REQUEST", message="Adaptation event has already been responded to", http_status=400, retryable=False)
         
     event.accepted = accepted
     

@@ -27,7 +27,7 @@ async def raising_route(request: Request):
 
 async def app_error_stream():
     yield "token", {"text": "about to raise app error"}
-    raise AppError("TEST_ERR", "Test message", 400, retryable=False, details={"foo": "bar"})
+    raise AppError(code="TEST_ERR", message="Test message", http_status=400, retryable=False, details={"foo": "bar"})
 
 @app.get("/app_error")
 async def app_error_route(request: Request):

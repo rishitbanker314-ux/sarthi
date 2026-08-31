@@ -17,7 +17,7 @@ async def verify_supabase_token(token: str) -> Claims:
         header = jwt.get_unverified_header(token)
         kid = header.get("kid")
         if not kid:
-            raise AppError("TOKEN_INVALID", "Missing kid in token header", False, 401)
+            raise AppError(code="TOKEN_INVALID", message="Missing kid in token header", http_status=401, retryable=False)
             
         jwks_client = get_jwks_client()
         key = await jwks_client.get_signing_key(kid)
@@ -32,11 +32,11 @@ async def verify_supabase_token(token: str) -> Claims:
         )
         return Claims(**payload)
     except jwt.ExpiredSignatureError:
-        raise AppError("TOKEN_EXPIRED", "Token has expired", False, 401)
+        raise AppError(code="TOKEN_EXPIRED", message="Token has expired", http_status=401, retryable=False)
     except jwt.PyJWKClientError:
-        raise AppError("TOKEN_INVALID", "Unable to find signing key", False, 401)
+        raise AppError(code="TOKEN_INVALID", message="Unable to find signing key", http_status=401, retryable=False)
     except jwt.InvalidTokenError:
-        raise AppError("TOKEN_INVALID", "Invalid token", False, 401)
+        raise AppError(code="TOKEN_INVALID", message="Invalid token", http_status=401, retryable=False)
 
 def verify_local_token(token: str) -> Claims:
     settings = get_settings()
@@ -50,6 +50,6 @@ def verify_local_token(token: str) -> Claims:
         )
         return Claims(**payload)
     except jwt.ExpiredSignatureError:
-        raise AppError("TOKEN_EXPIRED", "Token has expired", False, 401)
+        raise AppError(code="TOKEN_EXPIRED", message="Token has expired", http_status=401, retryable=False)
     except jwt.InvalidTokenError:
-        raise AppError("TOKEN_INVALID", "Invalid token", False, 401)
+        raise AppError(code="TOKEN_INVALID", message="Invalid token", http_status=401, retryable=False)
