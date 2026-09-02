@@ -31,7 +31,7 @@ async def stream_with_heartbeat(
     terminal_emitted = False
     
     def format_event(event: str, data: Any) -> str:
-        data_str = json.dumps(data) if isinstance(data, (dict, list, bool, int, float)) else str(data)
+        data_str = json.dumps(data, default=str) if isinstance(data, (dict, list, bool, int, float)) else str(data)
         return f"event: {event}\ndata: {data_str}\n\n"
 
     disconnect_task = asyncio.create_task(request.is_disconnected())

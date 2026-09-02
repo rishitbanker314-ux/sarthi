@@ -85,9 +85,9 @@ class TutorAgent:
         
         # In base.py, context gets substituted like {{key}}. So we format the data as JSON strings.
         context = {
-            "lesson_plan": json.dumps(lesson_draft, indent=2),
-            "learner_profile": json.dumps(profile, indent=2),
-            "mastery_state": json.dumps(mastery_state or {}, indent=2)
+            "lesson_plan": json.dumps(lesson_draft, indent=2, default=str),
+            "learner_profile": json.dumps(profile, indent=2, default=str),
+            "mastery_state": json.dumps(mastery_state or {}, indent=2, default=str)
         }
 
         return await run(
@@ -114,8 +114,8 @@ class TutorAgent:
             return get_reexplain_fallback_data()
             
         context = {
-            "original_block": json.dumps(original_block, indent=2),
-            "learner_profile": json.dumps(profile, indent=2),
+            "original_block": json.dumps(original_block, indent=2, default=str),
+            "learner_profile": json.dumps(profile, indent=2, default=str),
             "reason": reason or "No reason provided"
         }
         
@@ -145,9 +145,9 @@ class TutorAgent:
             
         context = {
             "message": message,
-            "history": json.dumps(history, indent=2),
-            "learner_profile": json.dumps(profile, indent=2),
-            "context_block": json.dumps(context_block, indent=2) if context_block else "None"
+            "history": json.dumps(history, indent=2, default=str),
+            "learner_profile": json.dumps(profile, indent=2, default=str),
+            "context_block": json.dumps(context_block, indent=2, default=str) if context_block else "None"
         }
         
         return await run(

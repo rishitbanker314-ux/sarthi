@@ -21,8 +21,8 @@ PLAN_RES=$(curl -s -X POST http://localhost:8000/api/v1/goals/${GOAL_ID}/plan -H
 echo "$PLAN_RES" | jq .
 JOB_ID=$(echo "$PLAN_RES" | jq -r .job_id)
 
-echo -e "\n5. GET /api/v1/jobs/${JOB_ID} (polling up to 20 times)"
-for i in {1..20}; do
+echo -e "\n5. GET /api/v1/jobs/${JOB_ID} (polling up to 60 times)"
+for i in {1..60}; do
   JOB_STATUS=$(curl -s -X GET http://localhost:8000/api/v1/jobs/${JOB_ID} -H "Authorization: Bearer $TOKEN")
   STATUS=$(echo "$JOB_STATUS" | jq -r .status)
   if [ "$STATUS" = "succeeded" ]; then

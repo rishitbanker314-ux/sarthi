@@ -40,11 +40,11 @@ async def run(
 
     # 2. Setup timeouts and model id
     if model_tier.lower() == "flash":
-        timeout = 20.0
-        model_id = "gemini-2.5-flash"
+        timeout = 60.0
+        model_id = "gemini-3.6-flash"
     else:
         timeout = 110.0
-        model_id = "gemini-2.5-pro"
+        model_id = "gemini-3.1-pro-preview"
     
     attempts = 0
     max_attempts = 2

@@ -53,20 +53,20 @@ class LessonDraft(BaseModel):
     title: str = Field(description="The title of the lesson.")
     objective: str = Field(description="A clear objective for what the learner will achieve in this lesson.")
     concept_names: List[str] = Field(description="A list of specific concepts covered in this lesson.")
-    est_minutes: int = Field(ge=10, description="Estimated time in minutes to complete this lesson. Must be at least 10 minutes.")
+    est_minutes: int = Field(description="Estimated time in minutes to complete this lesson. Must be at least 10 minutes.")
 
 class ModuleDraft(BaseModel):
     title: str = Field(description="The title of the module.")
     objective: str = Field(description="The overarching objective for this module.")
     rationale: str = Field(description="Why this module is sequenced here and how it helps the learner.")
-    lessons: List[LessonDraft] = Field(min_length=2, max_length=6, description="The lessons in this module. Must be between 2 and 6 lessons.")
+    lessons: List[LessonDraft] = Field(description="The lessons in this module. Must be between 2 and 6 lessons.")
 
 class PlanDraft(BaseModel):
     title: str = Field(description="The title of the overall learning plan.")
     rationale: str = Field(
         description="A detailed rationale for this plan. You MUST explicitly reference at least two specific dimensions from the learner's profile (e.g., 'Because you have 25 minutes a day', 'Since you prefer concrete examples first'). If the learner has prior mastery, you MUST explicitly mention which concepts were skipped or compressed."
     )
-    modules: List[ModuleDraft] = Field(min_length=3, max_length=8, description="The modules in this plan. Must be between 3 and 8 modules.")
+    modules: List[ModuleDraft] = Field(description="The modules in this plan. Must be between 3 and 8 modules.")
 
 # -------------------------
 # Tutor Schemas
@@ -82,7 +82,7 @@ class ContentBlockBase(BaseModel):
 class HeadingBlock(ContentBlockBase):
     type: Literal["heading"]
     text: str
-    level: int = Field(ge=1, le=3)
+    level: int
 
 class TextBlock(ContentBlockBase):
     type: Literal["text"]

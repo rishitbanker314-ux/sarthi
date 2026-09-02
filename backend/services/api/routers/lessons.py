@@ -140,10 +140,26 @@ async def _stream_lesson_content(lesson_id: UUID, user_id: UUID, db: AsyncSessio
     }
     
     try:
-        draft = await tutor_agent.generate_lesson(
-            lesson_draft=lesson_draft,
-            profile=profile_dict
+        gen_task = asyncio.create_task(
+            tutor_agent.generate_lesson(
+                lesson_draft=lesson_draft,
+                profile=profile_dict
+            )
         )
+        
+        stages = ["Reading your profile", "Choosing examples", "Writing the explanation"]
+        stage_idx = 0
+        
+        while not gen_task.done():
+            if stage_idx < len(stages):
+                yield "tool", {"name": stages[stage_idx], "status": "running"}
+                stage_idx += 1
+            
+            done, _ = await asyncio.wait([gen_task], timeout=2.0)
+            if gen_task in done:
+                break
+                
+        draft = gen_task.result()
         
         # We don't have true streaming from the SDK, so we yield blocks one by one
         # as if they were streamed.
@@ -153,7 +169,9 @@ async def _stream_lesson_content(lesson_id: UUID, user_id: UUID, db: AsyncSessio
             block_dict = block.model_dump()
             blocks.append(block_dict)
             yield "block", block_dict
-            await asyncio.sleep(0.1) # Simulate generation time
+            # Blocks are generated in one call and replayed here. 
+            # We simulate true token streaming with this sleep.
+            await asyncio.sleep(0.1)
             
         # Save to DB
         new_content = LessonContent(
