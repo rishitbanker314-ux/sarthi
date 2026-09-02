@@ -145,7 +145,7 @@ async def seed_demo_user():
             else:
                 print("Goal already exists, skipping creation of plan data.")
             
-            print(f"✅ Demo user 'demo@sarathi.app' seeded successfully. (User ID: {demo_user.id})")
+            print(f"[OK] Demo user 'demo@sarathi.app' seeded successfully. (User ID: {demo_user.id})")
 
 if __name__ == "__main__":
     asyncio.run(seed_demo_user())
