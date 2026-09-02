@@ -996,6 +996,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/47/c95ffc2009878c7aac0c5e08528022dcb885933252a88b5f170058014464/pydantic-2.13.5-py3-none-any.whl", hash = "sha256:346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73", size = 472589, upload-time = "2026-08-28T14:03:59.136Z" },
 ]
 
+[package.optional-dependencies]
+email = [
+    { name = "email-validator" },
+]
+
 [[package]]
 name = "pydantic-core"
 version = "2.46.5"
@@ -1309,12 +1314,11 @@ source = { virtual = "." }
 dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },
-    { name = "email-validator" },
     { name = "fastapi" },
     { name = "google-genai" },
     { name = "httpx" },
     { name = "psycopg", extra = ["binary"] },
-    { name = "pydantic" },
+    { name = "pydantic", extra = ["email"] },
     { name = "pydantic-settings" },
     { name = "pyjwt", extra = ["crypto"] },
     { name = "pyyaml" },
@@ -1336,12 +1340,11 @@ dev = [
 requires-dist = [
     { name = "alembic" },
     { name = "asyncpg" },
-    { name = "email-validator", specifier = ">=2.3.0" },
     { name = "fastapi" },
     { name = "google-genai" },
     { name = "httpx" },
     { name = "psycopg", extras = ["binary"] },
-    { name = "pydantic" },
+    { name = "pydantic", extras = ["email"] },
     { name = "pydantic-settings" },
     { name = "pyjwt", extras = ["crypto"] },
     { name = "pyyaml", specifier = ">=6.0.3" },
