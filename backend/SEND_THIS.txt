@@ -1,0 +1,13 @@
+Hey! The backend is fully ready for you to hook into, and we have a new offline-first testing flow.
+
+Here is what you need to do:
+
+1. Stop using the Prism mock and start pointing to the local backend on localhost:8000.
+2. In your frontend's `apps/web/.env.local`, set these exact three values:
+   NEXT_PUBLIC_API_BASE=http://localhost:8000/api/v1
+   NEXT_PUBLIC_SUPABASE_URL=https://zxltgrjvtznkqcdiohdy.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bHRncmp2dHpua3FjZGlvaGR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5OTkwNTAsImV4cCI6MjEwMzU3NTA1MH0.8_wLwmtXPzl80JGYmX9zAtar26lohM3d8v4glmmNE0s
+3. Run `git merge main` to pull the latest OpenAPI contract, and then run `pnpm gen:types` to regenerate the frontend clients.
+   🚨 Please never hand-write a TypeScript type for an API response! Always rely on the generated types.
+   🚨 If something is missing from the API, tell me instead of working around it.
+4. To start the backend, place the attached `.env` directly in the `backend/` folder and run `docker compose up -d --build` from INSIDE the `backend/` folder (or follow the README for instructions on `uv run`). You will also need to run migrations and the seed script (`uv run alembic upgrade head` & `uv run python -m scripts.seed_demo` from the `backend/` folder).

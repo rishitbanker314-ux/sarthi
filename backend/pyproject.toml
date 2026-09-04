@@ -1,0 +1,40 @@
+[project]
+name = "sarathi"
+version = "0.1.0"
+description = "Sarathi backend"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "psycopg[binary]",
+    "alembic",
+    "pydantic[email]",
+    "pydantic-settings",
+    "PyJWT[crypto]",
+    "httpx",
+    "structlog",
+    "google-genai",
+    "pyyaml>=6.0.3",
+    "slowapi>=0.1.10",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "black",
+]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["services*", "scripts*"]

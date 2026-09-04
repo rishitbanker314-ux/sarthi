@@ -1,6 +1,12 @@
-
+﻿# ── Secrets ──
 .env
 .env.local
+.env.*.local
+.agents/mcp_config.json
+
+# ── OS junk ──
+.DS_Store
+Thumbs.db
 
 # ── Frontend (Node) ──
 node_modules/
@@ -14,5 +20,11 @@ dist/
 *.tsbuildinfo
 coverage/
 .pnpm-store/
-.env.local
-.env.*.local
+
+# ── Backend (Python) ──
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
