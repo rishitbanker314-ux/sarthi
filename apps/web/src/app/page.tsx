@@ -1,69 +1,74 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@sarathi/ui";
+import { Compass, BookOpen, BrainCircuit } from "lucide-react";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="flex flex-col min-h-screen bg-background">
+      <main className="flex-1">
+        <section className="w-full py-24 md:py-32 lg:py-48 flex items-center justify-center">
+          <div className="container px-4 md:px-6 flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+              An intelligent tutor that <span className="text-primary">adapts to you.</span>
+            </h1>
+            <p className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Sarathi builds custom learning paths and adapts them in real-time as you learn, struggle, and master new concepts.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button asChild size="lg" className="h-12 px-8 text-base">
+                <Link href="/register">Get Started</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base">
+                <Link href="/login">Sign In</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40 border-y">
+          <div className="container px-4 md:px-6 mx-auto">
+            <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-3 max-w-5xl mx-auto">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <Compass className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold">Personalized Paths</h3>
+                <p className="text-muted-foreground">
+                  Define your learning goal and Sarathi creates a structured, multi-module plan tailored exactly to your baseline.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <BookOpen className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold">Active Learning</h3>
+                <p className="text-muted-foreground">
+                  Lessons stream in real-time. Built-in checkpoints ensure you're actively engaging with the material, not just reading.
+                </p>
+              </div>
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 bg-primary/10 rounded-full">
+                  <BrainCircuit className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold">Adaptive Loop</h3>
+                <p className="text-muted-foreground">
+                  Struggling with a concept? Sarathi identifies the gap and rewires your upcoming path to reinforce fundamentals.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+      
+      <footer className="w-full border-t py-6">
+        <div className="container px-4 md:px-6 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground mx-auto">
+          <p>© 2026 Sarathi. All rights reserved.</p>
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <Link href="/terms" className="hover:underline">Terms</Link>
+            <Link href="/privacy" className="hover:underline">Privacy</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -2,7 +2,7 @@
   "name": "@sarathi/api-types",
   "version": "0.1.0",
   "private": true,
-  "main": "index.ts",
+  "main": "main.ts",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

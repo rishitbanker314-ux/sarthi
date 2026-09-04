@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ContentBlock",
+  "type": "object",
+  "discriminator": { "propertyName": "type" },
+  "oneOf": [
+    { "$ref": "#/definitions/HeadingBlock" },
+    { "$ref": "#/definitions/TextBlock" },
+    { "$ref": "#/definitions/ListBlock" },
+    { "$ref": "#/definitions/CodeBlock" },
+    { "$ref": "#/definitions/MathBlock" },
+    { "$ref": "#/definitions/CalloutBlock" },
+    { "$ref": "#/definitions/ExampleBlock" },
+    { "$ref": "#/definitions/AnalogyBlock" },
+    { "$ref": "#/definitions/StepBlock" },
+    { "$ref": "#/definitions/QuizInlineBlock" },
+    { "$ref": "#/definitions/ImagePromptBlock" },
+    { "$ref": "#/definitions/DividerBlock" }
+  ],
+  "definitions": {
+    "HeadingBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "heading" },
+        "text": { "type": "string" },
+        "level": { "type": "integer", "enum": [1, 2, 3, 4, 5, 6] }
+      },
+      "required": ["id", "type", "text", "level"],
+      "additionalProperties": false
+    },
+    "TextBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "text" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "type", "content"],
+      "additionalProperties": false
+    },
+    "ListBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "list" },
+        "items": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ordered": { "type": "boolean" }
+      },
+      "required": ["id", "type", "items"],
+      "additionalProperties": false
+    },
+    "CodeBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "code" },
+        "code": { "type": "string" },
+        "language": { "type": "string" }
+      },
+      "required": ["id", "type", "code", "language"],
+      "additionalProperties": false
+    },
+    "MathBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "math" },
+        "expression": { "type": "string" },
+        "display": { "type": "boolean" }
+      },
+      "required": ["id", "type", "expression"],
+      "additionalProperties": false
+    },
+    "CalloutBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "callout" },
+        "variant": { "type": "string", "enum": ["info", "tip", "warning", "misconception", "ai_notice"] },
+        "title": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "type", "variant", "content"],
+      "additionalProperties": false
+    },
+    "ExampleBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "example" },
+        "title": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "type", "content"],
+      "additionalProperties": false
+    },
+    "AnalogyBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "analogy" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "type", "content"],
+      "additionalProperties": false
+    },
+    "StepBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "step" },
+        "content": { "type": "string" },
+        "reveal": { "type": "boolean" }
+      },
+      "required": ["id", "type", "content"],
+      "additionalProperties": false
+    },
+    "QuizInlineBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "quiz_inline" },
+        "question": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "correct_option_index": { "type": "integer" },
+        "feedback": { "type": "string" }
+      },
+      "required": ["id", "type", "question", "options", "correct_option_index", "feedback"],
+      "additionalProperties": false
+    },
+    "ImagePromptBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "image_prompt" },
+        "prompt": { "type": "string" },
+        "alt_text": { "type": "string" }
+      },
+      "required": ["id", "type", "prompt", "alt_text"],
+      "additionalProperties": false
+    },
+    "DividerBlock": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "divider" }
+      },
+      "required": ["id", "type"],
+      "additionalProperties": false
+    }
+  }
+}
