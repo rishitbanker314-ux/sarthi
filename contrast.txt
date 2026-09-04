@@ -1,0 +1,19 @@
+Contrast Ratios:
+
+LIGHT (Bg: #ffffff)
+text            #0f172a : 17.85:1
+accent          #4f46e5 : 6.29:1
+info            #0284c7 : 4.10:1
+tip             #059669 : 3.77:1
+warning         #d97706 : 3.19:1
+misconception   #e11d48 : 4.70:1
+ai              #7c3aed : 5.70:1
+
+DARK (Bg: #0f172a)
+text            #f8fafc : 17.06:1
+accent          #818cf8 : 5.98:1
+info            #38bdf8 : 8.33:1
+tip             #34d399 : 9.29:1
+warning         #fbbf24 : 10.69:1
+misconception   #fb7185 : 6.63:1
+ai              #a78bfa : 6.56:1
