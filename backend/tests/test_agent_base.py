@@ -54,7 +54,7 @@ async def test_base_run_success(mock_gemini):
         prompt_template_path="_test_prompt.md",
         context={"name": "Alice"},
         output_model=SmokeAnswer,
-        model_tier="flash"
+        model_tier=get_settings().get_agent_tier("test")
     )
 
     assert result.answer == "Success"
@@ -94,7 +94,7 @@ async def test_base_run_invalid_then_valid(mock_gemini):
         prompt_template_path="_test_prompt.md",
         context={"name": "Bob"},
         output_model=SmokeAnswer,
-        model_tier="flash"
+        model_tier=get_settings().get_agent_tier("test")
     )
 
     assert result.answer == "Success"
@@ -121,7 +121,7 @@ async def test_base_run_invalid_twice_falls_back(mock_gemini):
         prompt_template_path="_test_prompt.md",
         context={"name": "Charlie"},
         output_model=SmokeAnswer,
-        model_tier="flash",
+        model_tier=get_settings().get_agent_tier("test"),
         fallback_factory=fallback
     )
 
@@ -147,7 +147,7 @@ async def test_demo_mode_fallback():
         prompt_template_path="_test_prompt.md",
         context={"name": "Demo"},
         output_model=SmokeAnswer,
-        model_tier="flash"
+        model_tier=get_settings().get_agent_tier("test")
     )
     
     assert result.answer == "Paris"

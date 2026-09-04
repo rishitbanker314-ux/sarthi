@@ -6,7 +6,7 @@ from uuid import UUID
 import uuid
 
 from services.agents.base import run
-from services.agents.schemas import CheckpointDraft, EvaluationDraft
+from services.agents.schemas import CheckpointDraft, EvaluationDraft, StrictCheckpointDraft, StrictEvaluationDraft
 from services.api.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -57,8 +57,9 @@ class AssessorAgent:
             prompt_template_path="assessor_generate.md",
             context=context,
             output_model=CheckpointDraft,
-            model_tier="flash",
-            fallback_factory=get_checkpoint_fallback_data
+            model_tier=settings.get_agent_tier("assessor"),
+            fallback_factory=get_checkpoint_fallback_data,
+            strict_model=StrictCheckpointDraft
         )
 
     async def evaluate_checkpoint(
@@ -84,6 +85,7 @@ class AssessorAgent:
             prompt_template_path="assessor_evaluate.md",
             context=context,
             output_model=EvaluationDraft,
-            model_tier="flash",
-            fallback_factory=get_evaluation_fallback_data
+            model_tier=settings.get_agent_tier("assessor"),
+            fallback_factory=get_evaluation_fallback_data,
+            strict_model=StrictEvaluationDraft
         )

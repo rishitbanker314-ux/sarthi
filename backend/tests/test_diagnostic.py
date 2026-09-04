@@ -17,7 +17,7 @@ def mock_get_next_action():
         if len(transcript) < 4:
             return DiagnosticResponse(
                 complete=False,
-                question=NextQuestion(question_text=f"Question {len(transcript)}", question_type="short_text")
+                questions=[NextQuestion(question_text=f"Question {len(transcript)}", question_type="short_text")]
             )
         else:
             return DiagnosticResponse(

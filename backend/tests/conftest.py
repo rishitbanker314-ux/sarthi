@@ -39,8 +39,9 @@ async def client(db_session):
     """Provides a test client with overridden dependencies."""
     app.dependency_overrides[get_session] = lambda: db_session
     
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac
+    ac = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+    yield ac
+    await ac.aclose()
         
     app.dependency_overrides.clear()
 

@@ -39,18 +39,20 @@ class UsageStats:
             if fell_back:
                 s["fallbacks"] += 1
             
-            # Simple cost approximation (₹ per 1M tokens)
-            # Flash: Input ~₹6.22, Output ~₹24.9
-            # Pro: Input ~₹103, Output ~₹311
-            # Assuming Flash for all for now, or distinguish by tier
+            # Source: https://ai.google.dev/gemini-api/docs/pricing (as of Sept 3, 2026)
+            # Flash: $0.75 in / $3.75 out per 1M
+            # Pro: $2.00 in / $12.00 out per 1M
+            USD_TO_INR = 84.0
+            
             if "pro" in model_tier.lower():
-                input_cost_1m = 103.0
-                output_cost_1m = 311.0
+                input_cost_1m_usd = 2.00
+                output_cost_1m_usd = 12.00
             else:
-                input_cost_1m = 6.22
-                output_cost_1m = 24.9
+                input_cost_1m_usd = 0.75
+                output_cost_1m_usd = 3.75
                 
-            cost_inr = (input_tokens / 1_000_000 * input_cost_1m) + (output_tokens / 1_000_000 * output_cost_1m)
+            cost_usd = (input_tokens / 1_000_000 * input_cost_1m_usd) + (output_tokens / 1_000_000 * output_cost_1m_usd)
+            cost_inr = cost_usd * USD_TO_INR
             s["total_cost_inr"] = s.get("total_cost_inr", 0.0) + cost_inr
 
     async def get_all(self) -> Dict[str, Dict[str, Any]]:

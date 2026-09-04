@@ -48,8 +48,11 @@ def get_plan_generation_worker(goal_id: uuid.UUID, user_id: uuid.UUID) -> Callab
             
             await report(55, "Sequencing modules")
             
+            async def _progress_cb(msg: str):
+                await report(55, msg)
+                
             # Generate Plan using Agent
-            plan_draft = await generate_plan(goal_response, profile_response, mastery=[])
+            plan_draft = await generate_plan(goal_response, profile_response, mastery=[], progress_callback=_progress_cb)
             
             await report(80, "Writing lesson objectives")
             

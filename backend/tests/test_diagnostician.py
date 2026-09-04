@@ -15,7 +15,7 @@ def mock_gemini():
         yield client_instance
 
 @pytest.mark.asyncio
-@pytest.mark.skipif(not os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY") == "fake-key-for-tests", reason="Needs real API key")
+@pytest.mark.skipif(os.getenv("RUN_LIVE_TESTS") != "1", reason="Opt-in live test")
 async def test_diagnostician_fallback_sequence():
     """
     Test the fallback sequence by simulating a broken Gemini client (e.g. ValueError).
@@ -24,20 +24,20 @@ async def test_diagnostician_fallback_sequence():
         # First question
         res1 = await get_next_action([])
         assert not res1.complete
-        assert res1.question is not None
-        assert "What brings you to learn with us today" in res1.question.question_text
+        assert res1.questions is not None
+        assert "What brings you to learn with us today" in res1.questions[0].question_text
 
         # Some intermediate question
         res4 = await get_next_action([{"agent": "...", "learner": "..."}] * 3)
         assert not res4.complete
-        assert res4.question is not None
-        assert "worked examples" in res4.question.question_text
+        assert res4.questions is not None
+        assert "worked examples" in res4.questions[0].question_text
         
         # Micro-problem
         res6 = await get_next_action([{"agent": "...", "learner": "..."}] * 5)
         assert not res6.complete
-        assert res6.question is not None
-        assert res6.question.question_type == "micro_problem"
+        assert res6.questions is not None
+        assert res6.questions[0].question_type == "micro_problem"
 
         # Complete
         res_complete = await get_next_action([{"agent": "...", "learner": "..."}] * 8)
@@ -63,7 +63,7 @@ async def test_diagnostician_adaptive_logic():
         if len(transcript_obj) == 0:
             parsed = DiagnosticResponse(
                 complete=False,
-                question=NextQuestion(question_text="Are you new to programming?", question_type="single_choice", options=["yes", "no"])
+                questions=[NextQuestion(question_text="Are you new to programming?", question_type="single_choice", options=["yes", "no"])]
             )
             return FakeResponse(parsed)
             
@@ -73,13 +73,13 @@ async def test_diagnostician_adaptive_logic():
                 # Adapt to beginner
                 parsed = DiagnosticResponse(
                     complete=False,
-                    question=NextQuestion(question_text="Let's start simple. What is a variable?", question_type="short_text")
+                    questions=[NextQuestion(question_text="Let's start simple. What is a variable?", question_type="short_text")]
                 )
             else:
                 # Adapt to advanced
                 parsed = DiagnosticResponse(
                     complete=False,
-                    question=NextQuestion(question_text="Micro-problem: What does `asyncio.gather()` do?", question_type="micro_problem")
+                    questions=[NextQuestion(question_text="Micro-problem: What does `asyncio.gather()` do?", question_type="micro_problem")]
                 )
             return FakeResponse(parsed)
             
@@ -99,13 +99,13 @@ async def test_diagnostician_adaptive_logic():
         res_a = await get_next_action([
             {"agent": "Are you new to programming?", "learner": "Yes, completely new!"}
         ])
-        assert res_a.question.question_text == "Let's start simple. What is a variable?"
+        assert res_a.questions[0].question_text == "Let's start simple. What is a variable?"
         
         # Path B: Advanced
         res_b = await get_next_action([
             {"agent": "Are you new to programming?", "learner": "No, I have 5 years of experience."}
         ])
-        assert res_b.question.question_text == "Micro-problem: What does `asyncio.gather()` do?"
+        assert res_b.questions[0].question_text == "Micro-problem: What does `asyncio.gather()` do?"
 
         # Final profile completion
         res_c = await get_next_action([

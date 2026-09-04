@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from services.api.routers import health, dev_auth, me, diagnostic, profile, goals, jobs, plans, lessons, tutor, checkpoints, adaptation
 from services.api.errors import AppError
 from services.api.config import get_settings
+from services.agents.models import validate_models
 from services.api.middleware import RequestLoggingMiddleware, SecurityHeadersMiddleware
 
 from services.api.rate_limiter import limiter
@@ -22,6 +23,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 settings = get_settings()
+validate_models()
 
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestLoggingMiddleware)

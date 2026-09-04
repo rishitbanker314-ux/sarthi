@@ -22,11 +22,14 @@ async def parse_goal(raw_input: str) -> GoalParse:
             clarification_needed=None
         )
 
+    from services.api.config import get_settings
+    settings = get_settings()
+
     return await run(
         agent_name="goal_parser",
         prompt_template_path="goal_parser.md",
         context={"raw_input": raw_input},
         output_model=GoalParse,
-        model_tier="flash",
+        model_tier=settings.get_agent_tier("goal_parser"),
         fallback_factory=fallback
     )

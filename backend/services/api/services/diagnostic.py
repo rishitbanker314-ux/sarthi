@@ -27,10 +27,22 @@ async def start_session(user_id: uuid.UUID, db: AsyncSession) -> DiagnosticActio
     # 1. Start agent with empty transcript
     action = await get_next_action([])
     
-    # 2. Add question to transcript
+    # 2. Add question to transcript and queue remaining
     transcript = []
-    if not action.complete and action.question:
-        transcript.append({"agent": action.question.question_text})
+    q_schema = None
+    if not action.complete and action.questions:
+        q = action.questions[0]
+        transcript.append({"agent": q.question_text})
+        
+        q_schema = NextQuestionSchema(
+            question_text=q.question_text,
+            question_type=q.question_type,
+            options=q.options
+        )
+        
+        remaining = [qq.model_dump() for qq in action.questions[1:]]
+        if remaining:
+            transcript.append({"queue": remaining})
     
     # 3. Create session
     session = DiagnosticSession(
@@ -43,14 +55,6 @@ async def start_session(user_id: uuid.UUID, db: AsyncSession) -> DiagnosticActio
     await db.commit()
     await db.refresh(session)
     
-    q_schema = None
-    if action.question:
-        q_schema = NextQuestionSchema(
-            question_text=action.question.question_text,
-            question_type=action.question.question_type,
-            options=action.question.options
-        )
-        
     return DiagnosticActionResponse(
         id=session.id,
         status=session.status,
@@ -64,7 +68,7 @@ async def resume_session(session_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSes
     
     is_complete = session.status == DiagnosticStatus.completed
     q_schema = None
-    answered = max(0, len(session.transcript) // 2)
+    answered = len([x for x in session.transcript if "learner" in x])
 
     if not is_complete:
         # Find the last agent question
@@ -74,15 +78,10 @@ async def resume_session(session_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSes
                 last_q = item["agent"]
                 break
         
-        # We don't have the full options structure stored in transcript currently,
-        # but to satisfy the API shape we return what we can or rely on the frontend
-        # storing it. But wait, we should just run the agent again with the transcript minus the last agent question?
-        # No, re-running is expensive. Let's just return the text.
-        # Alternatively, we could store the full question dict in transcript.
         if last_q:
             q_schema = NextQuestionSchema(
                 question_text=last_q,
-                question_type="short_text" # default fallback
+                question_type="short_text"
             )
             
     return DiagnosticActionResponse(
@@ -103,35 +102,65 @@ async def answer_question(session_id: uuid.UUID, user_id: uuid.UUID, answer: str
     new_transcript = list(session.transcript)
     new_transcript.append({"learner": answer})
     
-    # Get next action
-    action = await get_next_action(new_transcript)
-    
-    # If agent asked another question, append it
     q_schema = None
-    if not action.complete and action.question:
-        new_transcript.append({"agent": action.question.question_text})
-        q_schema = NextQuestionSchema(
-            question_text=action.question.question_text,
-            question_type=action.question.question_type,
-            options=action.question.options
-        )
+    complete = False
+    derived_profile = None
+    
+    # Check if we have items in the queue
+    queue_idx = -1
+    for i, item in enumerate(new_transcript):
+        if "queue" in item:
+            queue_idx = i
+            break
+            
+    if queue_idx >= 0 and new_transcript[queue_idx]["queue"]:
+        queue = new_transcript[queue_idx]["queue"]
+        next_q = queue.pop(0)
+        new_transcript.append({"agent": next_q["question_text"]})
+        q_schema = NextQuestionSchema(**next_q)
+        
+        if queue:
+            new_transcript.append({"queue": queue})
+            
+        del new_transcript[queue_idx] # Remove old queue
+    else:
+        # Queue is empty, call agent
+        if queue_idx >= 0:
+            del new_transcript[queue_idx]
+            
+        action = await get_next_action(new_transcript)
+        complete = action.complete
+        if action.profile_draft:
+            derived_profile = action.profile_draft.model_dump(mode="json")
+            
+        if not action.complete and action.questions:
+            q = action.questions[0]
+            new_transcript.append({"agent": q.question_text})
+            q_schema = NextQuestionSchema(
+                question_text=q.question_text,
+                question_type=q.question_type,
+                options=q.options
+            )
+            
+            remaining = [qq.model_dump() for qq in action.questions[1:]]
+            if remaining:
+                new_transcript.append({"queue": remaining})
         
     session.transcript = new_transcript
     
-    if action.complete:
+    if complete:
         session.status = DiagnosticStatus.completed
         session.completed_at = func.now()
-        # model dump with mode="json" ensures Enums become strings
-        session.derived_profile = action.profile_draft.model_dump(mode="json") if action.profile_draft else {}
+        session.derived_profile = derived_profile or {}
         
     await db.commit()
     await db.refresh(session)
     
-    answered = len(session.transcript) // 2
+    answered = len([x for x in session.transcript if "learner" in x])
     return DiagnosticActionResponse(
         id=session.id,
         status=session.status,
-        complete=action.complete,
+        complete=complete,
         question=q_schema,
         progress=DiagnosticProgress(answered=answered)
     )

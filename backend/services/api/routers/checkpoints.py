@@ -35,7 +35,7 @@ async def generate_checkpoint(
         select(Signal).where(Signal.user_id == user.id).order_by(Signal.created_at.desc()).limit(10)
     )
     signals = signals_result.scalars().all()
-    signals_data = [{"type": s.type, "data": s.data, "created_at": s.created_at.isoformat()} for s in signals]
+    signals_data = [{"type": s.type, "data": s.value, "created_at": s.created_at.isoformat()} for s in signals]
 
     lesson_data = {
         "title": lesson.title,

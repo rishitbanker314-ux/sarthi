@@ -7,8 +7,8 @@ from services.api.models.enums import Pace, RepresentationPref, ScaffoldingPref,
 
 @pytest.mark.asyncio
 async def test_personalisation_differences():
-    if not os.environ.get("GEMINI_API_KEY"):
-        pytest.skip("Skipping personalisation integration test; GEMINI_API_KEY is not set.")
+    if not os.environ.get("GEMINI_API_KEY") or os.environ.get("RUN_LIVE_TESTS") != "1":
+        pytest.skip("Skipping personalisation integration test; RUN_LIVE_TESTS!=1 or missing API key.")
     
     agent = TutorAgent()
     

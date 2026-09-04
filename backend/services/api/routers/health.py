@@ -38,7 +38,18 @@ async def get_usage():
     for agent, data in stats.items():
         total_cost_inr += data.get("total_cost_inr", 0.0)
         
+    agent_tiers = {
+        "planner": settings.get_agent_tier("planner"),
+        "tutor": settings.get_agent_tier("tutor"),
+        "adaptor": settings.get_agent_tier("adaptor"),
+        "goal_parser": settings.get_agent_tier("goal_parser"),
+        "diagnostician": settings.get_agent_tier("diagnostician"),
+        "assessor": settings.get_agent_tier("assessor")
+    }
+
     return {
+        "model_profile": settings.model_profile,
+        "agent_tiers": agent_tiers,
         "agents": stats,
         "total_cost_inr": round(total_cost_inr, 4)
     }

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, List
 from uuid import UUID
 
 from services.agents.base import run
-from services.agents.schemas import LessonContentDraft, ReexplainDraft, TutorChatDraft
+from services.agents.schemas import LessonContentDraft, ReexplainDraft, TutorChatDraft, StrictLessonContentDraft, StrictReexplainDraft, StrictTutorChatDraft
 from services.api.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -95,8 +95,10 @@ class TutorAgent:
             prompt_template_path="tutor.md",
             context=context,
             output_model=LessonContentDraft,
-            model_tier="flash",
-            fallback_factory=get_fallback_data
+            model_tier=settings.get_agent_tier("tutor"),
+            fallback_factory=get_fallback_data,
+            strict_model=StrictLessonContentDraft,
+            pacing_timeout=0.0
         )
 
     async def reexplain_block(
@@ -124,8 +126,10 @@ class TutorAgent:
             prompt_template_path="reexplain.md",
             context=context,
             output_model=ReexplainDraft,
-            model_tier="flash",
-            fallback_factory=get_reexplain_fallback_data
+            model_tier=settings.get_agent_tier("tutor_reexplain"),
+            fallback_factory=get_reexplain_fallback_data,
+            strict_model=StrictReexplainDraft,
+            pacing_timeout=0.0
         )
 
     async def chat_reply(
@@ -155,6 +159,8 @@ class TutorAgent:
             prompt_template_path="tutor_chat.md",
             context=context,
             output_model=TutorChatDraft,
-            model_tier="flash",
-            fallback_factory=get_chat_fallback_data
+            model_tier=settings.get_agent_tier("tutor_chat"),
+            fallback_factory=get_chat_fallback_data,
+            strict_model=StrictTutorChatDraft,
+            pacing_timeout=0.0
         )

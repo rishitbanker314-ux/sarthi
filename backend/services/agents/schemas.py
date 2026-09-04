@@ -30,7 +30,7 @@ class NextQuestion(BaseModel):
 
 class DiagnosticResponse(BaseModel):
     complete: bool = Field(description="Set to true ONLY if you have enough information to derive all ProfileDraft fields.")
-    question: Optional[NextQuestion] = Field(default=None, description="The next question to ask. Required if complete is false.")
+    questions: Optional[List[NextQuestion]] = Field(default=None, description="The next batch of questions to ask. Required if complete is false.")
     profile_draft: Optional[ProfileDraft] = Field(default=None, description="The derived profile. Required if complete is true.")
 
 # -------------------------
@@ -161,6 +161,50 @@ ContentBlock = Union[
 class LessonContentDraft(BaseModel):
     blocks: List[ContentBlock]
 
+class WireContentBlock(BaseModel):
+    id: str
+    type: str
+    concept_id: Optional[UUID] = None
+    text: Optional[str] = None
+    level: Optional[int] = None
+    ordered: Optional[bool] = None
+    items: Optional[List[str]] = None
+    language: Optional[str] = None
+    code: Optional[str] = None
+    caption: Optional[str] = None
+    latex: Optional[str] = None
+    display: Optional[bool] = None
+    variant: Optional[str] = None
+    title: Optional[str] = None
+    setup: Optional[str] = None
+    steps: Optional[List[str]] = None
+    result: Optional[str] = None
+    maps_to: Optional[str] = None
+    index: Optional[int] = None
+    reveal: Optional[bool] = None
+    question: Optional[str] = None
+    options: Optional[List[str]] = None
+    answer_index: Optional[int] = None
+    explanation: Optional[str] = None
+    alt: Optional[str] = None
+    description: Optional[str] = None
+    
+    def to_content_block(self) -> ContentBlock:
+        data = self.model_dump(exclude_none=True)
+        # Attempt to map back to the real block based on 'type'
+        # The easiest way is to let Pydantic parse the dict into the Union
+        import pydantic
+        from pydantic import TypeAdapter
+        adapter = TypeAdapter(ContentBlock)
+        return adapter.validate_python(data)
+
+class WireLessonContentDraft(BaseModel):
+    blocks: List[WireContentBlock]
+    
+    def to_draft(self) -> LessonContentDraft:
+        return LessonContentDraft(blocks=[b.to_content_block() for b in self.blocks])
+
+
 class ReexplainDraft(BaseModel):
     reexplain_strategy: str = Field(description="The strategy chosen to explain this block differently (e.g. 'switched to concrete analogy', 'provided general rule').")
     blocks: List[ContentBlock]
@@ -207,6 +251,47 @@ class PlanChange(BaseModel):
 class AdaptationDecision(BaseModel):
     trigger: Literal["struggling", "stuck", "racing", "stalled", "decaying"] = Field(description="The trigger that fired.")
     action: Literal["insert_prerequisite", "slow_pace", "reexplain_concept", "compress_forward", "reorder", "extend_timeline", "no_op"] = Field(description="What to do.")
+    reason: str = Field(description="Specific reason shown to the learner. Must name the concept, cite evidence, and explain consequence. Do not use generic phrases.")
+    timeline_impact: str = Field(description="Concrete timeline impact shown to learner. E.g. 'adds ~25 min; still on track for your 12 Oct deadline'")
+    changes: List[PlanChange] = Field(description="The specific plan changes.")
+
+# -------------------------
+# Strict Validation Schemas
+# -------------------------
+from pydantic import model_validator, ValidationInfo
+
+class StrictLessonDraft(LessonDraft):
+    est_minutes: int = Field(ge=10, description="Estimated time in minutes to complete this lesson. Must be at least 10 minutes.")
+
+    @model_validator(mode='after')
+    def check_est_minutes(self, info: ValidationInfo):
+        if info.context and "session_minutes" in info.context:
+            session_minutes = info.context["session_minutes"]
+            if self.est_minutes > session_minutes:
+                raise ValueError(f"est_minutes ({self.est_minutes}) exceeds learner's session_minutes ({session_minutes})")
+        return self
+
+class StrictModuleDraft(ModuleDraft):
+    lessons: List[StrictLessonDraft] = Field(min_length=2, max_length=6, description="The lessons in this module. Must be between 2 and 6 lessons.")
+
+class StrictPlanDraft(PlanDraft):
+    modules: List[StrictModuleDraft] = Field(min_length=3, max_length=8, description="The modules in this plan. Must be between 3 and 8 modules.")
+
+class StrictAdaptationDecision(AdaptationDecision):
     reason: str = Field(min_length=60, description="Specific reason shown to the learner. Must name the concept, cite evidence, and explain consequence. Do not use generic phrases.")
     timeline_impact: str = Field(min_length=20, description="Concrete timeline impact shown to learner. E.g. 'adds ~25 min; still on track for your 12 Oct deadline'")
-    changes: List[PlanChange] = Field(description="The specific plan changes.")
+
+class StrictLessonContentDraft(LessonContentDraft):
+    pass
+
+class StrictReexplainDraft(ReexplainDraft):
+    pass
+
+class StrictTutorChatDraft(TutorChatDraft):
+    pass
+
+class StrictCheckpointDraft(CheckpointDraft):
+    pass
+
+class StrictEvaluationDraft(EvaluationDraft):
+    pass

@@ -38,3 +38,29 @@ async def generate_dev_token(req: DevAuthRequest, settings: Settings = Depends(g
     )
     
     return {"access_token": token, "token_type": "bearer"}
+
+@router.post("/demo/auth")
+async def generate_demo_token(settings: Settings = Depends(get_settings)):
+    if not settings.demo_mode:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Demo auth is only available in demo_mode.")
+        
+    email = "demo_learner@example.com"
+    user_id = dev_user_id(email)
+    
+    now = int(time.time())
+    payload = {
+        "sub": str(user_id),
+        "email": email,
+        "iat": now,
+        "exp": now + (24 * 3600), # 24 hours
+        "nbf": now
+    }
+    
+    token = jwt.encode(
+        payload,
+        settings.dev_jwt_secret,
+        algorithm="HS256"
+    )
+    
+    return {"access_token": token, "token_type": "bearer"}

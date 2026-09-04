@@ -55,7 +55,10 @@ class DummySessionMaker:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         pass
 
+import os
+
 @pytest.mark.asyncio
+@pytest.mark.skipif(os.getenv("RUN_LIVE_TESTS") != "1", reason="Opt-in live test")
 async def test_plan_generation_flow(client: AsyncClient, db_session: AsyncSession, test_user, goal, profile, token_headers, monkeypatch):
     # Patch the session maker so the background task uses the transactional session
     monkeypatch.setattr("services.api.jobs.runner.async_session", DummySessionMaker(db_session))
@@ -139,6 +142,7 @@ async def test_plan_already_generating_guard(client: AsyncClient, db_session: As
     assert "PLAN_ALREADY_GENERATING" in data["error"]["message"]
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(os.getenv("RUN_LIVE_TESTS") != "1", reason="Opt-in live test")
 async def test_replan_flow(client: AsyncClient, db_session: AsyncSession, test_user, goal, profile, token_headers, monkeypatch):
     # Create initial plan for replanning
     plan_id = uuid.uuid4()

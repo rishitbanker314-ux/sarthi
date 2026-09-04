@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 from services.agents.base import run
-from services.agents.schemas import PlanDraft
+from services.agents.schemas import PlanDraft, StrictPlanDraft
 from services.api.schemas.goal import GoalResponse
 from services.api.schemas.learner_profile import LearnerProfileResponse
 from services.api.config import get_settings
@@ -18,7 +18,9 @@ def _load_fallback() -> PlanDraft:
         data = json.load(f)
         return PlanDraft.model_validate(data)
 
-async def generate_plan(goal: GoalResponse, profile: LearnerProfileResponse, mastery: list[dict]) -> PlanDraft:
+from typing import Callable, Awaitable
+
+async def generate_plan(goal: GoalResponse, profile: LearnerProfileResponse, mastery: list[dict], progress_callback: Callable[[str], Awaitable[None]] | None = None) -> PlanDraft:
     """
     Generates a personalized plan for a learner using Gemini.
     """
@@ -36,15 +38,11 @@ async def generate_plan(goal: GoalResponse, profile: LearnerProfileResponse, mas
         prompt_template_path="planner.md",
         context=context,
         output_model=PlanDraft,
-        model_tier="pro",
-        fallback_factory=fallback_factory
+        model_tier=settings.get_agent_tier("planner"),
+        fallback_factory=fallback_factory,
+        strict_model=StrictPlanDraft,
+        validation_context={"session_minutes": profile.session_minutes},
+        progress_callback=progress_callback
     )
-
-    # Extra programmatic check: Ensure est_minutes <= session_minutes
-    for module in plan.modules:
-        for lesson in module.lessons:
-            if lesson.est_minutes > profile.session_minutes:
-                logger.warning(f"Lesson '{lesson.title}' exceeds session minutes ({lesson.est_minutes} > {profile.session_minutes}). Capping.")
-                lesson.est_minutes = profile.session_minutes
 
     return plan

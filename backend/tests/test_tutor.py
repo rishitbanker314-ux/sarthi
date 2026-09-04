@@ -26,7 +26,7 @@ def test_unknown_block_type_fails_parsing():
         LessonContentDraft.model_validate(invalid_data)
 
 @pytest.mark.asyncio
-@pytest.mark.skipif(not os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY") == "fake-key-for-tests", reason="Needs real API key")
+@pytest.mark.skipif(os.getenv("RUN_LIVE_TESTS") != "1", reason="Opt-in live test")
 async def test_tutor_agent_respects_representation_pref():
     # Need to run with DEMO_MODE = false for this test to hit the real model
     import os
