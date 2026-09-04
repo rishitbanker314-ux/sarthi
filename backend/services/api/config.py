@@ -39,8 +39,7 @@ class Settings(BaseSettings):
         if self.model_profile == "economy":
             return "flash"
         elif self.model_profile == "free":
-            if agent_name in ["planner"]:
-                return "pro"
+            # free = all flash because Pro has no free-tier quota (checked 2026-09-04)
             return "flash"
         else:
             # demo profile

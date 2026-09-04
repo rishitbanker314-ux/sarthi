@@ -15,7 +15,7 @@ def test_demo_profile_agent_tiers():
         # Test free profile
         settings.model_profile = "free"
         assert settings.get_agent_tier("diagnostician") == "flash"
-        assert settings.get_agent_tier("planner") == "pro"
+        assert settings.get_agent_tier("planner") == "flash"
         assert settings.get_agent_tier("tutor") == "flash"
         assert settings.get_agent_tier("adaptor") == "flash"
 
