@@ -1,0 +1,12 @@
+@import "@sarathi/ui/tokens.css";
+@import "tailwindcss";
+
+@config "../../tailwind.config.ts";
+
+@source "../../packages/ui/src";
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}

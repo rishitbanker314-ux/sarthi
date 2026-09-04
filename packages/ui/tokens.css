@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Foundation Colors: Slate */
+    --background: #ffffff;
+    --foreground: #0f172a;
+    
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #94a3b8;
+    
+    /* Accent: Indigo */
+    --accent: #4f46e5;
+    --accent-foreground: #ffffff;
+
+    /* Semantic Callouts */
+    --callout-info: #0369a1;
+    --callout-info-bg: #f0f9ff;
+    
+    --callout-tip: #15803d;
+    --callout-tip-bg: #f0fdf4;
+    
+    --callout-warning: #b45309;
+    --callout-warning-bg: #fffbeb;
+    
+    --callout-misconception: #be123c;
+    --callout-misconception-bg: #fff1f2;
+    
+    --callout-ai: #6d28d9;
+    --callout-ai-bg: #f5f3ff;
+
+    /* Mastery Scale (1-5) */
+    --mastery-1: #e2e8f0; /* Slate 200 */
+    --mastery-2: #bbf7d0; /* Green 200 */
+    --mastery-3: #4ade80; /* Green 400 */
+    --mastery-4: #16a34a; /* Green 600 */
+    --mastery-5: #166534; /* Green 800 */
+
+    /* Radii */
+    --radius: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-full: 9999px;
+
+    /* Motion */
+    --transition: 0.2s ease-in-out;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --background: #0f172a;
+      --foreground: #f8fafc;
+      
+      --card: #1e293b;
+      --card-foreground: #f8fafc;
+      
+      --popover: #1e293b;
+      --popover-foreground: #f8fafc;
+      
+      --muted: #334155;
+      --muted-foreground: #94a3b8;
+      
+      --border: #334155;
+      --input: #334155;
+      --ring: #475569;
+      
+      /* Accent: Indigo */
+      --accent: #818cf8;
+      --accent-foreground: #0f172a;
+
+      /* Semantic Callouts */
+      --callout-info: #38bdf8;
+      --callout-info-bg: rgba(56, 189, 248, 0.1);
+      
+      --callout-tip: #34d399;
+      --callout-tip-bg: rgba(52, 211, 153, 0.1);
+      
+      --callout-warning: #fbbf24;
+      --callout-warning-bg: rgba(251, 191, 36, 0.1);
+      
+      --callout-misconception: #fb7185;
+      --callout-misconception-bg: rgba(251, 113, 133, 0.1);
+      
+      --callout-ai: #a78bfa;
+      --callout-ai-bg: rgba(167, 139, 250, 0.1);
+
+      /* Mastery Scale (1-5) */
+      --mastery-1: #334155; /* Slate 700 */
+      --mastery-2: #166534; /* Green 800 */
+      --mastery-3: #15803d; /* Green 700 */
+      --mastery-4: #22c55e; /* Green 500 */
+      --mastery-5: #4ade80; /* Green 400 */
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    
+    --popover: #1e293b;
+    --popover-foreground: #f8fafc;
+    
+    --muted: #334155;
+    --muted-foreground: #94a3b8;
+    
+    --border: #334155;
+    --input: #334155;
+    --ring: #475569;
+    
+    --accent: #818cf8;
+    --accent-foreground: #0f172a;
+
+    --callout-info: #38bdf8;
+    --callout-info-bg: rgba(56, 189, 248, 0.1);
+    
+    --callout-tip: #34d399;
+    --callout-tip-bg: rgba(52, 211, 153, 0.1);
+    
+    --callout-warning: #fbbf24;
+    --callout-warning-bg: rgba(251, 191, 36, 0.1);
+    
+    --callout-misconception: #fb7185;
+    --callout-misconception-bg: rgba(251, 113, 133, 0.1);
+    
+    --callout-ai: #a78bfa;
+    --callout-ai-bg: rgba(167, 139, 250, 0.1);
+
+    --mastery-1: #334155;
+    --mastery-2: #166534;
+    --mastery-3: #15803d;
+    --mastery-4: #22c55e;
+    --mastery-5: #4ade80;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
